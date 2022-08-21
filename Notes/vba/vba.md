@@ -811,6 +811,7 @@ VBA函数
         fs.LoadFromFile "ReadFilePath"
         '循环获取每一行
         While Not fs.EOS
+            
             '-1 读取全部,-2逐行读取
             Line = fs.ReadText(-2)
             Debug.Print Line

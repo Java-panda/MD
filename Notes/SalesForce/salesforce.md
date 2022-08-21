@@ -9,7 +9,8 @@ SF笔记
       4. Multi-Tenant(多租户架构)
       5. CRM(客户关系管理)
       6. OTB(out-of-the-box)开箱即用
-      6. WSDL(Web Service Connector)
+      6. SOAP(Simple Object Access Protocol)
+      6. WSDL(Web Service Description Language)
       6. ISV(Independent Software Vendors)独立软件开发商
       
    2. SF编程组件
