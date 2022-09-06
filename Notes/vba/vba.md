@@ -199,7 +199,7 @@
   | Shell "B:\Notepad++\notepad++.exe", vbNormalFocus            | 打开App      |
   | Dim obj As Object<br/>Set obj = CreateObject("WScript.Shell")<br/>obj.Run "B:\Notepad++\readme.txt" | 打开文件     |
 
-对话框
+文件操作
 
 * FileDialog
 
@@ -236,7 +236,26 @@
    End If
   ```
 
-* 
+* FileSystemObject
+
+  ``` vb
+  Sub 文件夹递归遍历(path As String)
+  '应用Microsoft Scripting Runtime
+  Dim fos As New Scripting.FileSystemObject
+  'set fos =CreateObject("Scripting.FileSystemObject")
+  Dim folder, fol As folder
+  Dim f As File
+  Set folder = fos.GetFolder(path)
+  For Each f In folder.Files
+      Debug.Print f.Name
+  Next
+  For Each fol In folder.SubFolders
+      文件夹递归遍历 fol.path
+  Next
+  End Sub
+  ```
+
+  
 
 Application函数
 
