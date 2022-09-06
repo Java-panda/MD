@@ -203,6 +203,8 @@
 
 * FileDialog
 
+  文件
+
   ```vb
    '打开文件
    Dim fd As FileDialog
@@ -234,6 +236,38 @@
    Else
        Debug.Print "未选择任何文件"
    End If
+  ```
+
+* 文件夹
+
+  ``` vb
+  Sub run()
+  With Application.FileDialog(msoFileDialogFolderPicker)
+     If .Show = -1 Then
+      UploadImage .SelectedItems(1)
+     End If
+  End With
+  
+  End Sub
+  Sub UploadImage(path As String)
+  Dim sp As Shape
+  Dim folder, fol As folder
+  Dim fos As New Scripting.FileSystemObject
+  Dim f As File
+  Set folder = fos.GetFolder(path)
+  Dim sum As Double
+  For Each f In folder.Files
+      For Each sp In ActiveSheet.Shapes
+          If (sp.Top + sp.Height + 20) > sum Then
+              sum = sp.Top + sp.Height + 20
+          End If
+      Next
+      ActiveSheet.Shapes.AddPicture folder.path + "/" + f.Name, msoTrue, msoTrue, 0, sum, -1, -1
+  Next
+  For Each fol In folder.SubFolders
+      UploadImage fol.path
+  Next
+  End Sub
   ```
 
 * FileSystemObject
