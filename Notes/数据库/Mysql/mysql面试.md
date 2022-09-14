@@ -34,11 +34,42 @@
       commit;
       ```
 
-   3. 
+   3. 并发事务问题
 
-   4. 
+      1. 脏写
+         1. A,B事务都在更新数据,但是B事务不知道A已经更新,而直接更新覆盖了A的更新
+      2. 脏读
+         1. 事务B读取了事务A的修改但未提交的数据
+      3. 不可重复读
+         1. 同一个事务内,多次读取同一个查询语句,结果不相同
+      4. 幻读
+         1. 事务B读取到了事务A新提交的数据,读多了
+
+   4. 事务的隔离级别
+
+      1. Read Uncommitted:读未提交
+         1. A事务未提交B事务也可以读取到变化
+         2. 问题:脏读,不可重复读,幻读
+      2. Read Comimitted:读已提交
+         1. A事务提交之后,B事务才可以读取到变化
+         2. 问题:不可重复读,幻读
+         3. 原理:MVCC每次读取最新的Read View版本
+      3. Repeatable Read:可重复读()
+         1. A事务提交之后,B事务读取到的仍然为第一次读到的结果
+         2. 问题:幻读,脏写
+         3. 原理:MVCC每次读取第一次的Read View版本
+      4. Serializable:可串行化
+         1. A事务未结束前,B事务一直阻塞等待
+         2. 原理:相当于查询语句后面加上lock in share mode
+
+   5. 设置事务隔离级别
+
+      1. set tx_isolation='Read-Uncommitted','Read-Comimitted','Repeatable-Read','Serializable',
 
 3. MVCC(multi-version-concurrent-control)多版本并发控制
+
+   1. 当前读
+   2. 快照读
 
 4. Mysql锁
 
@@ -53,6 +84,9 @@
          1. 开销大,加锁慢,粒度小,并发性大,锁冲突低
       3. 共享锁
       4. 排它锁
+      5. 乐观锁
+         1. 添加一个Version记录版本.每次更新带上Version,如果Version匹配则直接更新,否则更新失败
+      6. 悲观锁
 
 5. Mysql索引失效场景
 
@@ -120,4 +154,30 @@
        3. 不满足最左前缀原则
        4. 多个索引字段排序升降不同
 
-       
+6. SQL执行计划
+
+   1. 使用方法
+      1. Explain +Select语句
+   2. select_type
+      1. Simple:简单查询没有子查询
+      2. Primary:复杂查询中的主干查询
+      3. Subquery:From前的子查询
+      4. Derived:From后的子查询
+      5. Union:Union后的查询
+   3. type
+      1. System:系统级别
+      2. Const:常数级别
+      3. eq_ref:唯一索引
+      4. ref:非唯一索引
+      5. range:范围查找
+      6. index:覆盖索引
+      7. all:全表扫描
+   4. Extra
+      1. Useing Index:索引覆盖
+      2. Useing Where:包含Where条件,同时查询的列没有被索引覆盖
+      3. Using index condition:查询的列没有完全被索引覆盖
+      4. Using temporary:产生临时表,一般需要进行优化
+      5. Using filesort:需要外部排序,一般需要优化
+      6. Select tables optimized away:对索引列使用了某些函数
+
+   
