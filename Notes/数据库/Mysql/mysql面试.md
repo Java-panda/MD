@@ -88,7 +88,15 @@
          1. 添加一个Version记录版本.每次更新带上Version,如果Version匹配则直接更新,否则更新失败
       6. 悲观锁
 
-5. Mysql索引失效场景
+5. Mysql 索引类型
+
+   1. Index:普通索引(可以重复)
+   2. primary key:主键索引(唯一,非空)
+   3. unique:唯一索引(唯一,可空)
+   4. composite index:组合索引(组合唯一,第一个索引时才可生效)
+   5. fulltext:全文索引(char,varchar,text的关键字搜索)
+   
+6. Mysql索引失效场景
 
    ``` sql
    CREATE TABLE `user` (
@@ -154,7 +162,7 @@
        3. 不满足最左前缀原则
        4. 多个索引字段排序升降不同
 
-6. SQL执行计划
+7. SQL执行计划
 
    1. 使用方法
       1. Explain +Select语句

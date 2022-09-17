@@ -66,6 +66,143 @@
    End Sub
    ```
 
-   
+3. 文件选择
 
-3. 其他
+   ``` vb
+   Sub FilePickerApi()
+       '打开文件
+       Dim fd As FileDialog
+       Set fd = Application.FileDialog(msoFileDialogFilePicker)
+       fd.Title = "文件选择"
+       fd.Filters.Clear
+       '过滤器
+       fd.Filters.Add "JPG图片", "*.jpg;*.jpeg"
+       fd.Filters.Add "XML", "*.xml"
+       '默认过滤器index
+       fd.FilterIndex = 1
+       fd.AllowMultiSelect = True
+       fd.ButtonName = "确认"
+       '默认打开路径
+       fd.InitialFileName = Environ("HOMEPATH") + "\Desktop\"
+       '界面文件图标显示类型
+       fd.InitialView = msoFileDialogViewThumbnail
+       '代表excel=1480803660
+       Debug.Print fd.Creator
+       'FileDialog(msoFileDialogFilePicker)
+       Debug.Print fd.Item
+       'Microsoft Excel
+       Debug.Print fd.Parent.name
+       '-1选择完毕,0未选择文件
+       Dim i As Integer
+       If fd.Show = -1 Then
+           For i = 1 To fd.SelectedItems().Count
+               Debug.Print fd.SelectedItems(i)
+           Next
+       Else
+           Debug.Print "未选择任何文件"
+       End If
+   End Sub
+   ```
+
+4. 文件夹选择
+
+   ``` vb
+   Sub FolderPickerApi()
+       '打开文件夹
+       Dim fd As FileDialog
+       Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+       fd.Title = "文件夹选择"
+       '确认按钮文本
+       fd.ButtonName = "确认"
+       '默认打开路径
+       fd.InitialFileName = Environ("HOMEPATH") + "\Desktop\"
+       '界面文件图标显示类型
+       fd.InitialView = msoFileDialogViewThumbnail
+       If fd.Show = -1 Then
+           For i = 1 To fd.SelectedItems().Count
+               Debug.Print fd.SelectedItems(i)
+           Next
+       Else
+           Debug.Print "未选择任何文件"
+       End If
+   End Sub
+   ```
+
+5. 保存文件选择
+
+   ``` vb
+   Sub FileDialogSaveApi()
+       Dim fd As FileDialog
+       Set fd = Application.FileDialog(msoFileDialogSaveAs)
+       fd.Title = "文件保存"
+       fd.ButtonName = "确认"
+       '默认打开路径
+       fd.InitialFileName = Environ("HOMEPATH") + "\Desktop\"
+       '界面文件图标显示类型
+       fd.InitialView = msoFileDialogViewThumbnail
+       If fd.Show = -1 Then
+           For i = 1 To fd.SelectedItems().Count
+               Debug.Print fd.SelectedItems(i)
+           Next
+       Else
+           Debug.Print "未设定文件保存名"
+       End If
+   End Sub
+   ```
+
+6. 递归文件夹中的文件
+
+   ``` vb
+   Sub RecursiveFindFileInFolder(path As String)
+       Dim folder, fol As Object
+       Dim fos As New Scripting.FileSystemObject
+       Dim f As Object
+       Set folder = fos.GetFolder(path)
+       For Each f In folder.Files
+           Debug.Print f.name
+       Next
+       For Each fol In folder.SubFolders
+           RecursiveFindFileInFolder fol.path
+       Next
+   End Sub
+   ```
+
+7. AdodbStream文件读取
+
+   ``` vb
+   Sub AdodbStreamApi()
+       '引用法需要打开MicroSoft Activx Data Objects
+       Dim fs As New Stream
+       Dim line As String
+       '绑定法
+       'Dim fs As Object
+       'Set fs = CreateObject("adodb.stream")
+           
+       '文本类型adTypeBinary/adTypeText
+       fs.Type = adTypeText
+       '读写模式
+       fs.Mode = adModeReadWrite
+       '编码格式
+       fs.Charset = "UTF-8"
+       '设置行分隔符为回车换行
+       fs.LineSeparator = adCRLF
+       '开流
+       fs.Open
+       '通过文件加载流
+       fs.LoadFromFile "C:\Users\77023\Desktop\a.txt"
+       '循环获取每一行
+       While Not fs.EOS
+           
+           '-1 读取全部,-2逐行读取
+           line = fs.ReadText(-2)
+           Debug.Print line
+       Wend
+       '保存流到文件
+       fs.SaveToFile "C:\Users\77023\Desktop\b.txt", adSaveCreateOverWrite
+       '关流
+       fs.Close
+       Set fs = Nothing
+   End Sub
+   ```
+
+8. 其他

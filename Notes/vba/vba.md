@@ -181,8 +181,6 @@
   | On Error Resume Next | 出错后继续执行   |
   | On Error Goto XXX    | 出错后跳转到     |
 
-* 
-
 * | 常量   | 作用     |
   | ------ | -------- |
   | vbCrLf | 回车换行 |
@@ -198,98 +196,6 @@
   | Application.Quit                                             | 退出App      |
   | Shell "B:\Notepad++\notepad++.exe", vbNormalFocus            | 打开App      |
   | Dim obj As Object<br/>Set obj = CreateObject("WScript.Shell")<br/>obj.Run "B:\Notepad++\readme.txt" | 打开文件     |
-
-文件操作
-
-* FileDialog
-
-  文件
-
-  ```vb
-   '打开文件
-   Dim fd As FileDialog
-   Set fd = Application.FileDialog(msoFileDialogFilePicker)
-   fd.Title = "JPG图片选择"
-   fd.Filters.Clear
-   '过滤器
-   fd.Filters.Add "JPG图片", "*.jpg;*.jpeg"
-   fd.Filters.Add "XML", "*.xml"
-   '默认过滤器index
-   fd.FilterIndex = 1
-   fd.AllowMultiSelect = True
-   fd.ButtonName = "确认"
-   '默认打开路径
-   fd.InitialFileName = "C:\Users\77023\Desktop\"
-   '界面文件图标显示类型
-   fd.InitialView = msoFileDialogViewThumbnail
-   '代表excel=1480803660
-   Debug.Print fd.Creator
-   'FileDialog(msoFileDialogFilePicker)
-   Debug.Print fd.Item
-   'Microsoft Excel
-   Debug.Print fd.Parent.name
-   '-1选择完毕,0未选择文件
-   If fd.Show = -1 Then
-       For i = 1 To fd.SelectedItems().Count
-           Debug.Print fd.SelectedItems(i)
-       Next
-   Else
-       Debug.Print "未选择任何文件"
-   End If
-  ```
-
-* 文件夹
-
-  ``` vb
-  Sub run()
-  With Application.FileDialog(msoFileDialogFolderPicker)
-     If .Show = -1 Then
-      UploadImage .SelectedItems(1)
-     End If
-  End With
-  
-  End Sub
-  Sub UploadImage(path As String)
-  Dim sp As Shape
-  Dim folder, fol As folder
-  Dim fos As New Scripting.FileSystemObject
-  Dim f As File
-  Set folder = fos.GetFolder(path)
-  Dim sum As Double
-  For Each f In folder.Files
-      For Each sp In ActiveSheet.Shapes
-          If (sp.Top + sp.Height + 20) > sum Then
-              sum = sp.Top + sp.Height + 20
-          End If
-      Next
-      ActiveSheet.Shapes.AddPicture folder.path + "/" + f.Name, msoTrue, msoTrue, 0, sum, -1, -1
-  Next
-  For Each fol In folder.SubFolders
-      UploadImage fol.path
-  Next
-  End Sub
-  ```
-
-* FileSystemObject
-
-  ``` vb
-  Sub 文件夹递归遍历(path As String)
-  '应用Microsoft Scripting Runtime
-  Dim fos As New Scripting.FileSystemObject
-  'set fos =CreateObject("Scripting.FileSystemObject")
-  Dim folder, fol As folder
-  Dim f As File
-  Set folder = fos.GetFolder(path)
-  For Each f In folder.Files
-      Debug.Print f.Name
-  Next
-  For Each fol In folder.SubFolders
-      文件夹递归遍历 fol.path
-  Next
-  End Sub
-  ```
-
-  
 
 Application函数
 
@@ -837,43 +743,6 @@ VBA函数
         Next
         Close #1
         Close #2
-    End Sub
-    ```
-  
-* Adodb.Stream
-
-  * ```vb
-    Sub AdodbStream()
-        '引用法需要打开MicroSoft Activx Data Objects
-        Dim fs As New Stream
-        '绑定法
-        'Dim fs As Object
-    	'Set fs = CreateObject("adodb.stream")
-            
-        '文本类型
-        fs.Type = adTypeText
-        '读写模式
-        fs.Mode = adModeReadWrite
-        '编码格式
-        fs.Charset = "UTF-8"
-        '设置行分隔符为回车换行
-        fs.LineSeparator = adCRLF
-        '开流
-        fs.Open
-    	'通过文件加载流
-        fs.LoadFromFile "ReadFilePath"
-        '循环获取每一行
-        While Not fs.EOS
-            
-            '-1 读取全部,-2逐行读取
-            Line = fs.ReadText(-2)
-            Debug.Print Line
-        Wend
-        '保存流到文件
-        fs.SaveToFile "WriteFilePath", adSaveCreateOverWrite
-        '关流
-        fs.Close
-        Set fs = Nothing
     End Sub
     ```
 
