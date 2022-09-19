@@ -226,6 +226,48 @@
       }
       ```
 
+   8. Heap Sort
+
+      ``` java
+      /**
+       * Heap Sort
+       * Time Complexity
+       * Space Complexity
+       * @param arr sort arr
+       */
+      public static void heapSort(int[] arr){
+          //第一次构建大顶堆,至下而上,从右往左倒序构建大顶堆
+          for (int i = arr.length/2-1; i >=0 ; i--) {
+              //最后一个非叶子节点开始直到根节点构建大顶堆
+              adjustHeap(arr,i,arr.length);
+          }
+          int temp;
+          //循环数组长度-1次将每一次构建成的大顶堆的根节点元素放到相对最后一位
+          for (int i = arr.length-1; i >0; i--) {
+              temp=arr[i];
+              arr[i]=arr[0];
+              arr[0]=temp;
+              //放完一次根节点到最后之后此时堆中除了根节点以外所有节点均满足大顶堆定义,所以只需要从上到下调整新的大顶堆,即开始节点为0
+              adjustHeap(arr,0,i);
+          }
+      }
+      public static void adjustHeap(int[] arr,int nodeIndex,int len){
+          int temp =arr[nodeIndex];
+          for (int i = 2*nodeIndex+1; i <len ; i=i*2+1) {
+              if (i+1<len&&arr[i]<arr[i+1]){
+                  i++;
+              }
+              if (arr[i]>temp){
+                  arr[nodeIndex]=arr[i];
+                  nodeIndex=i;
+              }else {
+                  break;
+              }
+          }
+          arr[nodeIndex]= temp;
+      }
+      ```
+
 5. 查找算法
 
    1. 线性查找
