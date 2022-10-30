@@ -1,0 +1,4 @@
+- Docker容器启动镜像后没有反应,程序状态显示Exited(1)
+  - 现象:docker ps -a显示Exited(1)
+  - 原因:
+  - 解决方法:
