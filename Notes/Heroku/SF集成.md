@@ -1,0 +1,8 @@
+- 集成方式
+  - Heroku Connect
+    - data replication
+    - data proxies
+  - Salesforce Connect
+  - Salesforce REST APIs
+  - Callouts
+  - Canvas
