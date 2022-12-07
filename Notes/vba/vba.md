@@ -901,7 +901,45 @@ Excel功能集对应excel操作
     ActiveSheet.PageSetup.PrintArea = Cells(1, 1).CurrentRegion.Address + ":" + Cells(row, col).CurrentRegion.Address
     ```
 
+Excel调用自定义Dll文件
+
+1. 先创建VB DLL项目定义类模块信息
+
+2. 导出为DLL后缀文件
+
+3. 注册DLL文件到系统
+
+   ```bat
+   #切记要以管理员身份运行cmd命令
+   regsvr32 Panda.dll
+   ```
+   
+4. Excel再引用DLL文件便可以在项目中使用
+
 ADO数据库操作
+
+1. 连接Excel文件
+
+2. ```vb
+    Sub ado()
+        Dim conn As New ADODB.Connection
+        Dim ret As Recordset
+        Dim i As Long
+        conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\77023\Desktop\MD笔记\MD\Notes\vba\vba\ado1.xlsx;Extended Properties='Excel 12.0; HDR=YES; IMEX=3'"
+        Set ret = conn.Execute("select a.*,b.depart from [Sheet1$] a left join [Sheet2$] b  on a.name=b.name")
+        Do While (Not ret.EOF)
+        Debug.Print ret.GetRows
+            Debug.Print ret.Fields("id")
+            For i = 0 To ret.Fields.Count - 1
+                Debug.Print ret.Fields(i)
+            Next
+            ret.MoveNext
+        Loop
+        conn.Close
+    End Sub
+    ```
+
+1. 
 
 1. 连接PostgreSQL
 

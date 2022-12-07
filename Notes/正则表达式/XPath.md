@@ -12,6 +12,11 @@ XPath
   - 注释
   - 文档节点/根节点
 
+- 快捷使用
+
+  - 打开Google浏览器,F12查看源代码
+  - Ctrl+F可以弹出Xpath选择器
+  
 - 语法
 
   - | 规则                  | 含义                       |
@@ -89,5 +94,47 @@ XPath
     | and    | 与             | //book[price>18 and price<30] | 选取price>18并且price<30的book节点 |
     | mod    | 计算除法的余数 | //book[price mod 2=0]         | 选取price为偶数的book节点          |
 
-  
+- Jsoup中使用
+
+  - 引入maven坐标
+
+  - ```xml
+    <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>1.15.3</version>
+    </dependency>
+    ```
+
+  - ```java
+    // 读取本地文件
+    // Document document = Jsoup.parse(new File("C:\\Users\\77023\\Desktop\\a.html"));
+    // 读取在线网页
+    Document document = Jsoup.connect("http://www.tl.changyou.com/data/mission/kuang1.shtml").get();
+    // 获取xpath匹配元素集
+    Elements stones = document.selectXpath("//table[@class=\"center table_news\"]");
+    for (int i = 0; i < stones.size(); i++) {
+        //提取图片标签
+        Elements urlE = stones.get(i).selectXpath("//table[@class=\"center table_news\"]//tr[1]//img");
+        //获取图片src属性
+        String src = urlE.get(i).attr("src");
+        //实际业务需求适应
+        if (src.split("/").length==2){
+            src="http://www.tl.changyou.com/data/mission/"+urlE.get(i).attr("src");
+        }
+        System.out.println("URL:"+src);
+        //提取元素
+        Elements descriptionE = stones.get(i).selectXpath("//table[@class=\"center table_news\"]//tr[2]/td");
+        //获取文本
+        System.out.println("Description:"+descriptionE.get(i).text());
+        //提取元素
+        Elements titleE = stones.get(i).selectXpath("//table[@class=\"center table_news\"]//th");
+        //获取文本
+        System.out.println("Title:"+titleE.get(i).text());
+        System.out.println();
+    }
+    ```
+
+  - 
+
 

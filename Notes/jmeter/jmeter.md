@@ -70,4 +70,45 @@
          | 4**    | 请求错误       |
          | 5**    | 服务器内部错误 |
 
-         
+3. 项目结构
+
+   1. Test Plan(项目根目录)
+      1. Thread Group(一个线程组)
+         1. Http Request(一个请求)
+            1. PreProcessors(请求前置处理器)
+            2. PostProcessors(请求后置处理器)
+         2. View Results Tree(结果树不同格式显示)
+            1. Text
+            2. HTML
+            3. XML
+            4. JSON
+            5. Xpath
+            6. RegExp
+            7. CSS Selector
+
+4. 语法规则
+
+   1. 变量引用
+      1. ${变量名}
+   2. 提取器
+      1. Xpath
+         1. //table//th
+         2. Match:
+            1. 0:随机
+            2. -1:全部
+            3. n:第n个匹配结果
+      2. RegExp
+         1. "title":"(.*?)"
+         2. Template:i
+            1. 匹配到的第i组
+            2. 0代表整体匹配的值,n代表第n个括号的匹配值
+         3. Match:
+            1. 0:随机
+            2. -1:全部
+            3. n:第n个匹配结果
+      3. JSON
+         1. data.list[2].title
+         2. Match:
+            1. 0:随机
+            2. -1:全部
+            3. n:第n个匹配结果
