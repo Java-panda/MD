@@ -205,4 +205,58 @@
    End Sub
    ```
 
-8. 其他
+8. ADO百万数据操作案例
+
+   ```vb
+   Sub ado()
+       Dim conn As New ADODB.Connection
+       Dim ret As Recordset
+       Dim i As Long
+       Dim line As String
+       Dim fs As New Stream
+       fs.Type = adTypeText
+       fs.Mode = adModeReadWrite
+       fs.Charset = "UTF-8"
+       fs.LineSeparator = adCRLF
+       fs.Open
+       conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\77023\Desktop\MD笔记\MD\Notes\vba\vba\ado1.xlsx;Extended Properties='Excel 12.0; HDR=YES; IMEX=3'"
+       Set ret = conn.Execute("select a.*,b.depart from [Sheet1$] a left join [Sheet2$] b  on a.id=b.id")
+       Do While (Not ret.EOF)
+           line = ""
+           For i = 0 To ret.Fields.Count - 1
+               If i <> ret.Fields.Count - 1 Then
+                   line = line + """" & ret.Fields(i) & """" & ","
+               Else
+                   line = line + """" & ret.Fields(i) & """" & vbCrLf
+               End If
+           Next
+           fs.WriteText line
+           ret.MoveNext
+       Loop
+       fs.SaveToFile "C:\Users\77023\Desktop\b.txt", adSaveCreateOverWrite
+       fs.Close
+       conn.Close
+   End Sub
+   ```
+
+9. Bean的基本使用
+
+   ```vb
+   Public id As String
+   Public name As String
+   Public age As String
+   Public gender As Boolean
+   Public depart As String
+   Public birth As Date
+   Public Function ToString() As String
+       Dim line As String
+       ToString = """" + id + """" + "," _
+       + """" + name + """" + "," _
+       + """" + age + """" + "," _
+       & gender & "," _
+       + """" + depart + """" + "," _
+       + """" + CStr(birth) + """"
+   End Function
+   ```
+
+10. 其他

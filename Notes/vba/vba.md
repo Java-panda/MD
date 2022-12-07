@@ -903,6 +903,29 @@ Excel功能集对应excel操作
 
 ADO数据库操作
 
+1. 连接Excel文件
+
+2. ```vb
+    Sub ado()
+        Dim conn As New ADODB.Connection
+        Dim ret As Recordset
+        Dim i As Long
+        conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\77023\Desktop\MD笔记\MD\Notes\vba\vba\ado1.xlsx;Extended Properties='Excel 12.0; HDR=YES; IMEX=3'"
+        Set ret = conn.Execute("select a.*,b.depart from [Sheet1$] a left join [Sheet2$] b  on a.name=b.name")
+        Do While (Not ret.EOF)
+        Debug.Print ret.GetRows
+            Debug.Print ret.Fields("id")
+            For i = 0 To ret.Fields.Count - 1
+                Debug.Print ret.Fields(i)
+            Next
+            ret.MoveNext
+        Loop
+        conn.Close
+    End Sub
+    ```
+
+1. 
+
 1. 连接PostgreSQL
 
 2. ```vb
