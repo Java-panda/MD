@@ -1139,11 +1139,15 @@ SF笔记
             1. 对象字段
                1. 无法使用SELECT *
                2. 可选当前对象的任意字段,默认会自动查询出ID
-               2. Fields(ALL,CUSTOM.STANDARD)
+               3. Fields(ALL,CUSTOM.STANDARD)
+                  1. 使用ALL,CUSTOM时最大限度200条
+
             2. 父.字段
                1. 子查父时可以直接查询父对象的字段
+
             3. (子查询)
                1. 父查子时使用小括号
+
             4. 对象
                1. 标准对象
                   1. 对象名=对象名
@@ -1152,6 +1156,7 @@ SF笔记
                      1. 对象名=对象名__c
                   2. 子查父/父查子
                      1. 对象名=对象名__r
+
             5. 条件
                1. =,!=,<,<=,>,>=, 
                2. AND/OR/NOT
@@ -1169,18 +1174,68 @@ SF笔记
                   1. 不包含A
                8. 条件中引用变量
                   1. WHERE 字段名=:变量
+
             6. ORDER BY
                1. ASC:升序
                2. DESC:降序
+
             7. NULLS FIRST/LAST
                1. FIRST:排序时遇到NULL放在前面
                2. LAST:排序时遇到NULL放在后面
+
             8. OFFSET
                1. 设定偏移行数,结合LIMIT可用于分页查询
+
             9. FOR UPDATE
                1. 加锁更新操作
+
             10. ALL ROWS
                 1. 可查询出删除掉的数据
+
+            11. 共通多态字段
+
+                1. 常见多态字段
+
+                   1. Owner:数据的所有者(User,Calendar)
+                   2. Who:数据的所有人(User)
+                   3. What:数据相关的参照类型(任意)
+
+                2. 属性
+
+                   1. Type
+                      1. What.Type可以判断多态字段的真实类型
+
+                3. 动态SOQL
+
+                   1. ```sql
+                      SELECT 
+                        TYPEOF What
+                          WHEN Account THEN Phone, NumberOfEmployees
+                          WHEN Opportunity THEN Amount, CloseDate
+                          ELSE Name, Email
+                        END
+                      FROM Event
+                      ```
+
+                   2. 
+
+            12. 举例
+
+                1. ```sql
+                   -- 自定义子对象查父对象,父对象为自定义对象时使用__r(Order__r),父对象为标准对象时将末尾ID去掉(CreatedById=>CreatedBy),父对象的项目可以直接
+                   select ID,Name,Price__c,Order__r.ID,Order__r.Name,Order__r.SumPrice__c,CreatedBy.Name from OrderDetail__c
+                   -- 标准子对象查父对象,父对象为自定义时对象使用__r(Order__r),父对象为标准对象时将末尾ID去掉(AccountId=>Account)
+                   SELECT Id,FirstName, Account.Id,Account.Name,Order__r.Name from Contact where id ='0035h00000ZpefOAAR'
+                   -- 标准父对象查子对象,子对象为标准对象时使用关联list名(Contacts)
+                   Select Id,Name,(Select Id,Name From Contacts) From Account
+                   -- 自定义父对象查子对象,父对象为自定义对象时使用关联list名__r(Employee__r)
+                   Select Id,Name,(Select Id,Name From Employee__r) From Department__c
+                   
+                   -- OwnerId,WhatId,WhoId是泛型字段,代表未知类型的参照关系
+                   SELECT Id, Subject,Owner.Type,What.Type,Who.Type,StartDateTime,EndDateTime FROM Event
+                   ```
+
+                2. 
 
          2. 转义字符
 
@@ -2117,295 +2172,6 @@ SF笔记
              3. System.debug()为System命名空间内的System类的方法,全称应该为System.System.debug()
           2. 命名空间,类名,变量名如果发生歧义的优先级顺序
              1. 变量.字段名>类名.静态方法名.字段名>命名空间.类名.静态方法名.字段名
-
-8. visualforce
-
-   画面框架,类似于JSP,基于MVC
-
-   1. 入门案例
-
-      1. 打开开发模式便于在线调试(非必须):My Personal Information->Advanced User Details->Development Mode->Show View State in Development
-
-      2. 默认VS Code环境已经配置完成
-
-      3. SFDX: Create Project 创建一个空项目
-
-      4. SFDX: Authorize an Org 建立SF平台授权关系
-
-      5. SFDX: Create VisualForce Page创建一个VF页面
-
-      6. 目录结构如下
-
-         1. 页面名.page
-
-            ```html
-            <apex:page>
-                <!-- Begin Default Content REMOVE THIS -->
-                <h1>Congratulations</h1>
-                This is your new Page
-                <!-- End Default Content REMOVE THIS -->
-            </apex:page>
-            ```
-
-         2. 页面名.page-meta.xml
-
-            ```xml
-            <?xml version="1.0" encoding="UTF-8"?>
-            <ApexPage xmlns="http://soap.sforce.com/2006/04/metadata"> 
-                <apiVersion>52.0</apiVersion>
-                <label>页面名</label>
-            </ApexPage>
-            ```
-
-      7. SFDX: Deploy Source to Org 部署到SF
-
-      8. 访问https://当前实例地址/apex/页面名
-
-   2. 运行原理
-
-       ![A diagram indicating the way a Visualforce page runs on the platform](https://developer.salesforce.com/docs/resources/img/en-us/234.0?doc_id=dev_guides%2Fpages%2Fimages%2Fpages_intro_dev_architecture.jpg&folder=pages)
-
-      1. 开发人员编写VisualForce源代码保存到云平台
-      2. 平台编译为抽象指令集保存其元数据到元数据仓库
-      3. VisualForce页面渲染器通过解析渲染元数据展示画面内容
-
-   3. 核心知识要点
-
-      1. 标签
-
-         1. 原生html标签
-
-         2. apex标签
-
-            1. page:根标签
-      
-               ```html
-               <!-- 基本 -->
-               <apex:page>
-               	根标签,类似于html中的<html>
-               </apex:page>
-                   
-               <!-- 属性 -->
-               <!-- 标准控制器,引入标准对象 -->
-               standardController="标准对象名称"
-               ```
-
-            2. pageBlock/pageBlockSection/pageBlockButtons
-
-               pageBlock:定义一个区块
-
-               pageBlockSection:定义一个下拉折叠
-      
-               pageBlockButtons:定义一个按钮区
-      
-               ```html
-               <apex:form> 
-                   <apex:pageBlock title="1.页面区块标签">
-                       <!-- 折叠区域 -->
-                       <apex:pageBlockSection columns="1" title="1.1折叠区域">
-                           <apex:inputField value="{!Contact.FirstName}"></apex:inputField>
-                           <apex:inputField value="{!Contact.LastName}"></apex:inputField>
-                           <apex:inputField value="{!Contact.Email}"></apex:inputField>
-                           <apex:inputField value="{!Contact.Birthdate}"></apex:inputField>
-                       </apex:pageBlockSection>
-                       <!-- 按钮    -->
-                       <apex:pageBlockButtons>
-                           <apex:commandButton action="{!save}" value="保存">
-                           </apex:commandButton>
-                       </apex:pageBlockButtons> 
-                   </apex:pageBlock>
-               </apex:form>
-               ```
-      
-            3. pageBlockTable
-      
-               pageBlockTable:迭代器
-      
-               ```html
-               <apex:pageBlock title="pageBlockTable">
-                   <apex:pageBlockSection columns="1" title="展开/折叠">
-                       <apex:pageBlockTable value="{!Contact.Cases}" var="case">
-                           <apex:column title="操作">
-                               <apex:outputLink value="{!URLFOR ($Action.Case.Edit,Case.Id)}">
-                                   Edit
-                               </apex:outputLink>
-                               &nbsp;
-                               <apex:outputLink value="{!URLFOR ($Action.Case.Delete,Case.Id)}">
-                                   Del
-                               </apex:outputLink>
-                           </apex:column>
-                           <apex:column value="{!case.Subject}"></apex:column>
-                           <apex:column value="{!case.Priority}"></apex:column>
-                           <apex:column value="{!case.Status}"></apex:column>
-                       </apex:pageBlockTable>
-                   </apex:pageBlockSection>
-               </apex:pageBlock>=
-               ```
-      
-            4. details/relatedList
-      
-               details:显示该条记录
-      
-               relatedList:显示相关记录
-      
-               ```html
-               <apex:pageBlock title="details/relatedList">
-                   <apex:pageBlockSection columns="1" title="展开/折叠">
-                       <!-- 默认为true展示所有相关记录.设为false则可通过relatedList显示部分相关记录 -->
-                       <apex:detail relatedList="false">
-                           <!-- 定义想要展示的相关记录 -->
-                           <apex:relatedList list="Cases"></apex:relatedList>
-                       </apex:detail>
-                   </apex:pageBlockSection>
-               </apex:pageBlock>
-               ```
-      
-            5. inputField/pageMessages
-      
-               inputField:输入框
-      
-               pageMessages:消息提示
-      
-               ```html
-               <apex:form> 
-                   <apex:pageBlock title="inputField/pageMessages">
-                       <!-- 消息提示 -->
-                       <apex:pageMessages></apex:pageMessages>
-                       <!-- 输入框 -->
-                       <apex:pageBlockSection columns="1" title="展开/折叠">
-                           <apex:inputField value="{!Contact.FirstName}"></apex:inputField>
-                           <apex:inputField value="{!Contact.LastName}"></apex:inputField>
-                           <apex:inputField value="{!Contact.Email}"></apex:inputField>
-                           <apex:inputField value="{!Contact.Birthdate}"></apex:inputField>
-                       </apex:pageBlockSection>
-                       <!-- 按钮    -->
-                       <apex:pageBlockButtons>
-                           <apex:commandButton action="{!save}" value="保存"></apex:commandButton>
-                       </apex:pageBlockButtons> 
-                   </apex:pageBlock>
-               </apex:form>
-               ```
-      
-            6. outputField
-      
-               outputField:输出
-      
-               ```html
-               <apex:pageBlock title="outputField">
-                   <apex:pageBlockSection columns="1" title="展开/折叠">
-                       <apex:outputField value="{!Contact.FirstName}"></apex:outputField>
-                       <apex:outputField value="{!Contact.LastName}"></apex:outputField>
-                       <apex:outputField value="{!Contact.Email}"></apex:outputField>
-                       <apex:outputField value="{!Contact.Birthdate}"></apex:outputField>
-                   </apex:pageBlockSection>
-               </apex:pageBlock>
-               ```
-      
-            7. image
-      
-               image:图片
-      
-               ```html
-               <apex:pageBlock title="image">
-                   <apex:pageBlockSection columns="1" title="展开/折叠">
-                       <apex:image url="https://developer.salesforce.com/files/salesforce-developer-network-logo.png"></apex:image>
-                   </apex:pageBlockSection>
-               </apex:pageBlock>
-               ```
-      
-            8. includeScript/stylesheet
-      
-               includeScript:引入JS静态资源
-      
-               stylesheet:引入CSS静态资源
-      
-               ```html
-               <!-- 预先上传静态资源 -->
-               <!-- 引入js -->
-               <apex:includeScript value="{! $Resource.Jquery }"/>
-               <!-- 从压缩文件引入js -->
-               <apex:includeScript value="{! URLFOR($Resource.MyZip,'jquery-3.6.0.min.js') }"/>
-               <!-- 引入css -->
-               <apex:stylesheet value="{! $Resource.MyCss }" />
-               <!-- 从压缩文件引入css -->
-               <apex:stylesheet value="{! URLFOR($Resource.MyZip,'MyCss.css') }" />
-               <!-- 使用引入的js -->
-               <script type="text/javascript">
-                   $(document).ready(function() {
-                       $("#div").html("静态JS的引用");
-                   });
-               </script>
-               <apex:pageBlock title="includeScript">
-                   <apex:pageBlockSection columns="1" title="展开/折叠">
-                       <div id="div"></div>
-                   </apex:pageBlockSection>
-               </apex:pageBlock>
-               ```
-      
-      2. 表达式
-      
-         1. {!表达式}
-      
-            ```html
-            <apex:page standardController="Account">
-                <!-- 访问页面时加上?id=AccountId即可显示该Account的名称-->
-                {!Account.Name}
-            </apex:page>
-            ```
-      
-         2. 函数
-      
-            ```html
-            TODAY()
-            MONTH()
-            DAY()
-            YEAR()
-            MAX/MIN(1,2,3)
-            SQRT(100)
-            <!-- 判断父中是否包含子-->
-            CONTAINS('父', '子')
-            <!-- 三元表达式-->
-            IF(Boolean,True,False)
-            <!-- 跳转路径-->
-            URLFOR(URL,参数)
-            ```
-            
-         3. $全局变量.属性名称
-      
-            ```html
-            <apex:page>
-                {!$User.FirstName}
-            </apex:page>
-            ```
-      
-            | 常用全局变量表达式                  | 含义                     |
-            | ----------------------------------- | -------------------------- |
-            | $Action.对象名.Edit/Delete | 定义一个行为 |
-            | $Api                                | 尚未学习                   |
-            | $Asset                              | 尚未学习                   |
-            | $Cache.Org                          | 尚未学习                   |
-            | $Cache.Session                      | 尚未学习                   |
-            | $Component                          | 尚未学习                   |
-            | $ComponentLabel                     | 尚未学习                   |
-            | $CurrentPage                        | 尚未学习                   |
-            | $FieldSet                           | 尚未学习                   |
-            | $Label                              | 尚未学习                   |
-            | $Label.Site                         | 尚未学习                   |
-            | $MessageChannel                     | 尚未学习                   |
-            | $Network                            | 尚未学习                   |
-            | $ObjectType                         | 尚未学习                   |
-            | $Organization                       | 尚未学习                   |
-            | $Page                               | 尚未学习                   |
-            | $Permission                         | 尚未学习                   |
-            | $Profile                            | 尚未学习                   |
-            | $Resource.静态资源API名 | 静态资源引用 |
-            | $SControl                           | 尚未学习                   |
-            | $Setup                              | 尚未学习                   |
-            | $Site                               | 尚未学习                   |
-            | $System.OriginDateTime              | 尚未学习                   |
-            | $User.用户属性             | 用户信息获取 |
-            | $User.UITheme/User.UIThemeDisplayed | 尚未学习                   |
-            | $UserRole                           | 尚未学习                   |
 
 9. lwc
 

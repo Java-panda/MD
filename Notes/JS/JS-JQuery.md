@@ -14,8 +14,8 @@
     - JQuery
 
       - ``` js
-        //获取所有元素
-        $("selector")
+        //获取所有元素,DOM对象象定查询dom范围
+        $("selector"[,DOM对象])
         ```
 
 - 属性
@@ -226,6 +226,82 @@
         ```
 
       - 
+
+- Dom操作
+
+  - JQuery
+
+    - ```js
+      A.append(B)//B加到A内部最后
+      A.appendTo(B)//A加到B内部最后(破坏)
+      A.prepend(B)//B加到A内部最前
+      A.prependTo(B)//A加到B内部最前(破坏)
+      A.before(B)//B加到A的前面
+      A.after(B)//B加到A的后面
+      A.insertBefore(B)//A加到B的前面(破坏)
+      A.insertAfter(B)//A加到B的后面(破坏)
+      A.wrap(B)//A加上一层B壳
+      A.wrapInner(B)//A的子元素加上一层B壳
+      A.wrapAll(B)//第一个A加上一层B壳,但是其他A会after到第一个A
+      A.unwrap(B)//A去掉上一层B壳
+      A.clone()//克隆一个A避免破坏原来的A
+      A.empty()//清空所有子元素包括文本
+      A.replaceWith(B)//用B代替A
+      A.replaceAll(B)//用A代替B
+      A.remove()//删除A及其事件,数据,还原后事件无效
+      A.detach()//删除A但是保留事件和数据,还原后事件还有效
+      ```
+  
+- 筛选
+
+  - JQuery
+
+    - ``` js
+      A.end()//返回A的上一级对象
+      A.eq(索引)//获取第N个元素
+      A.next()//获取A所在列表位置下一个元素
+      A.prev()//获取A所在列表位置上一个元素
+      A.children()//获取A的子元素
+      A.parent()//获取A的父元素
+      ```
+
+    - 
+
+- Ajax
+
+  - JS
+
+  - JQuery
+
+    - ```js
+      $.ajax({
+          url:"",
+          type: "GET",
+          contentType: "application/json",
+          data:{
+          },
+          dataType:"json",
+          success:function (data, textStatus, jqXHR){
+      
+          },
+          error:function (XMLHttpRequest, textStatus, errorThrown){
+      
+          }
+      });
+      ```
+
+    - 
+
+- JQuery手册
+
+  - 元素隐藏/显示
+
+    - ```js
+      $("selector").show();
+      $("selector").hide();
+      ```
+
+    - 
 
 - 附录
 
