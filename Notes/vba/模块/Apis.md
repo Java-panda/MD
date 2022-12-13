@@ -219,7 +219,7 @@
        fs.Charset = "UTF-8"
        fs.LineSeparator = adCRLF
        fs.Open
-       Conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\77023\Desktop\MD笔记\MD\Notes\vba\vba\ado1.xlsx;Extended Properties='Excel 12.0; HDR=YES; IMEX=3'"
+       Conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\77023\Desktop\MDｱﾊｼﾇ\MD\Notes\vba\vba\ado1.xlsx;Extended Properties='Excel 12.0; HDR=YES; IMEX=3'"
        Set Ret = Conn.Execute("select a.*,b.depart from [Sheet1$] a left join [Sheet2$] b  on a.id=b.id")
        Do While (Not Ret.EOF)
            line = ""
@@ -338,4 +338,5 @@
     End Function
     ```
 
-11. 其他
+11. 
+=======
