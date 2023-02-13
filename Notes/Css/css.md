@@ -308,6 +308,68 @@ CSS
 
       - 
 
+- Flex布局
+
+  - ```css
+    .parent{
+        border: 1px solid red;
+        height: 500px;
+        /*padding: 10px 10px;*/
+    
+        display: flex; /* 声明父元素flex布局*/
+        /* 设置主轴方向 */
+        flex-direction: column-reverse; /* 纵向反转*/
+        flex-direction: column; /* 纵向*/
+        flex-direction: row-reverse; /* 横向反转*/
+        flex-direction: row; /* 横向*/
+    
+        /* 设置主轴方向对齐方式:左,又,居中,循环间距相等 */
+        justify-content: start;/* 左对齐*/
+        justify-content: end;/* 右对齐*/
+        justify-content: center; /* 居中对齐*/
+        justify-content: space-around; /* 环绕循环均分对齐*/
+        justify-content: space-between; /* 两侧靠边,中间均分对齐*/
+        justify-content: space-evenly;/* 所有间隙均分对齐*/
+    
+        /* 是否换行 */
+        flex-wrap: wrap-reverse;/*换行反转*/
+        flex-wrap: wrap;/*换行*/
+        flex-wrap: nowrap;/*默认不换行*/
+    
+        /* 侧轴对齐方式 单行 */
+        align-items: stretch; /*自动拉伸,子元素不能设置高度*/
+        align-items: flex-end;
+        align-items: flex-start;
+        align-items: center;
+    
+        /* 侧轴对齐方式 多行 */
+        align-content: flex-start;
+        align-content: flex-end;
+        align-content: space-around;
+        align-content: space-between;
+        align-content: stretch;
+        align-content: center;
+    
+    }
+    .child{
+        /* 设置子元素权重*/
+        flex: 1;
+        height: 100px;
+        background-color: aquamarine;
+        margin: 10px 5px;
+    }
+    .child:nth-child(3){
+        /* 设置子元素权重*/
+        flex: 3;
+        /* 设置子元素权重*/
+        /* 排序数字越小越靠前*/
+        order: -1;
+        align-self: flex-end;
+    }
+    ```
+
+  - 
+
 - 属性列表:link:https://www.runoob.com/cssref/css-reference.html
 
 - 常用属性

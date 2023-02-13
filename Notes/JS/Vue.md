@@ -26,7 +26,7 @@ Vue
 
     - 
 
-- 项目结构理解
+- Webpack项目结构理解
 
   - src(开发代码)
 
@@ -332,7 +332,304 @@ Vue
 
 - Vue-CLI
 
+  - 安装/创建项目
+
+    - ```bat
+      npm install -g @vue/cli
+      
+      vue create 项目名
+      
+      cd 项目名
+      npm run serve //开发环境
+      npm run build //生产打包
+      ```
+
+  - 项目结构
+
+    - node_modules:依赖包
+    - public
+      - 图标
+      - 首页
+    - src:开发代码
+      - assets:静态资源
+      - components:开发的组件
+      - App.vue:根组件
+      - main.js:程序入口
+    - babel.config.js
+    - package.json
+    - vue.config.js
+
 - 组件
+
+  - 作用:抽象UI模型以便用于复用
+
+  - 组成
+
+    - ```vue
+      <template>
+        <div id="app">
+        </div>
+      </template>
+      
+      template下只能有一个根标签
+      ```
+
+    - ```vue
+      <script>
+      import HelloWorld from './components/HelloWorld.vue'
+      
+      export default {
+        name: 'App',
+        components: {
+          HelloWorld
+        }
+      }
+      </script>
+      ```
+
+    - ```vue
+      lang="less"支持less
+      scope防止式样冲突,之作用在this组件
+      /deep/可以穿透到子组件修改子组件样式
+      <style lang="less" scoped>
+      /deep/ h3 {
+        margin: 40px 0 0;
+      }
+      #app {
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        margin-top: 60px;
+      }
+      </style>
+      ```
+
+  - 使用步骤
+
+    - 导包组件
+
+      - ```js
+        import HelloWorld from './components/HelloWorld.vue'
+        ```
+
+    - 注册组件
+
+      - ```js
+        components: {HelloWorld}//私有
+        
+        //在main.js中注册全局组件
+        import HelloWorld from './components/HelloWorld'
+        Vue.component("HelloWorld",HelloWorld)
+        ```
+
+    - 标签传参
+
+      - ```vue
+        <template>
+          <div id="app">
+            <HelloWorld msg="Hello Vue"/>
+          </div>
+        </template>
+        ```
+
+  - 开发组件
+
+    - ```vue
+      <template>
+        <div>
+          <input type="text" v-model="dmsg">
+          <input type="text" v-model="dname">
+        </div>
+      </template>
+      
+      <script>
+      export default {
+        name: 'HelloWorld',
+        props: {//定义属性供调用者传参
+          msg: {
+            type: String,
+            default: "Hello",
+            required: true
+          },
+          name: {
+            type: String,
+            default: "Panda",
+            required: false
+          }
+        },
+        data(){
+          return {
+            dmsg: this.msg,//属性默认不允许修改进而转存到其他变量中
+            dname: this.name
+          }
+        }
+      }
+      </script>
+      <style scoped lang="less">
+      
+      </style>
+      
+      ```
+
+  - 生命周期
+
+    - 创建阶段
+      - beforecreate:属性,数据,方法均为创建,基本不用
+      - created:发送请求获取初始化加载数据
+      - beforemount:准备挂载dom
+      - mounted:dom结构渲染完成
+    - 运行阶段(值发生变化触发)
+      - beforeupdate
+      - updated
+    - 销毁阶段(v-if为false可以触发)
+      - beforedestroy:销毁前
+      - destroyed:销毁后
+
+  - 组件传值
+
+    - 父传子
+
+      - 原理:子组件创建属性,父组件调用的时候传入属性值
+
+    - 子传父
+
+      - 原理:子组件发送事件并传值给父组件,父组件监听事件并获取值
+
+    - 兄弟传值
+
+      - 原理:借助一个事件总线,进行间接传值,相当于A传给父F,F再传给子B
+
+    - ```vue
+      main.js
+      //创建事件总线,进行数据通信
+      Vue.prototype.$bus =new Vue()
+      
+      
+      
+      ```
+
+    - ```vue
+      <template>
+        <div>
+          <h3>父组件</h3>
+          <input type="text" v-model="dmsg">
+          <Son :msg="dmsg" @sendMsgToFarther="getMsgFromSon"></Son>
+          <Brother></Brother>
+        </div>
+      </template>
+      
+      <script>
+      import Son from './Son.vue'
+      import Brother from './Brother.vue'
+      export default {
+          components:{
+              Son,Brother
+          },
+          props:{
+              msg:{
+                  type: String
+              }
+          },
+          data() {
+              return {
+                  dmsg : this.msg
+              }
+          },
+          methods: {
+              getMsgFromSon(val){
+                  this.dmsg = val
+              }
+          },
+      }
+      </script>
+      
+      <style scoped lang="less">
+          h3{
+              color:pink;
+          }
+      </style>
+      
+      
+      <template>
+        <div>
+          <h3>子组件</h3>
+          <input type="text" v-model="dmsg">
+        </div>
+      </template>
+      
+      <script>
+      export default {
+          props:{
+              msg:{
+                  type: String
+              }
+          },
+          data() {
+              return {
+                  dmsg : this.msg
+              }
+          },
+          methods: {
+              sendMsgToFarther(){
+                  
+              }
+          },
+          watch:{
+              msg(){
+                  this.dmsg = this.msg
+              },
+              dmsg(){
+                  this.$emit("sendMsgToFarther",this.dmsg)
+                  this.$bus.$emit("share",this.dmsg)
+              }
+          }
+      }
+      </script>
+      
+      <style scoped lang="less">
+          h3{
+              color: aqua;
+          }
+      </style>
+      
+      
+      <template>
+        <div>
+          <h3>兄弟组件</h3>
+          <input type="text" v-model="dmsg">
+        </div>
+      </template>
+      
+      <script>
+      export default {
+          data() {
+              return {
+                  dmsg : ""
+              }
+          },
+          created() {
+              this.$bus.$on("share",val=>{
+                  this.dmsg=val
+                  }
+              )
+          },
+          methods: {
+          },
+          watch:{
+          }
+      }
+      </script>
+      
+      <style scoped lang="less">
+          h3{
+              color: aqua;
+          }
+      </style>
+      ```
+
+    - 
 
 - 路由
 
