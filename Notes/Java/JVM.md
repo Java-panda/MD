@@ -1,4 +1,50 @@
-1. 内存模型(本地虚拟计算一堆方法)
+1. 引用类型
+
+   1. 强引用
+
+      1. ```java
+         Object p1 = new Object();
+         System.out.println(p1);//不回收
+         System.gc();
+         System.out.println(p1);//不回收
+         ```
+
+   2. 软引用
+
+      1. ```java
+         Object p2 = new Object();
+         SoftReference<Object> personSoftReference = new SoftReference<>(p2);
+         System.out.println(personSoftReference.get());//不回收
+         p2=null;
+         System.gc();//,内存够用则不回收,内存不够则回收
+         System.out.println(personSoftReference.get());
+         ```
+
+   3. 弱引用
+
+      1. ```java
+         Object p3 = new Object();
+         WeakReference<Object> personWeakReference = new WeakReference<>(p3);
+         System.out.println(personWeakReference.get());//不回收
+         p3=null;
+         System.gc();
+         System.out.println(personWeakReference.get());//回收
+         ```
+
+   4. 虚引用
+
+      1. ```java
+         Object p4 = new Object();
+         ReferenceQueue<Object> queue = new ReferenceQueue<>();
+         PhantomReference<Object> phantomReference = new PhantomReference<>(p4, queue);
+         System.out.println(phantomReference.get());//回收
+         p4=null;
+         System.gc();
+         System.out.println(phantomReference.get());//回收
+         ```
+
+2. 内存模型(本地虚拟计算一堆方法)
+
    1. 方法区 
    2. 堆
       1. 新生代:1
@@ -21,7 +67,8 @@
          1. 线程太多
       3. StackOverflowError
          1. 栈帧过多,递归过深
-2. 类加载器
+
+3. 类加载器
    1. 步骤
       1. 加载
       2. 链接
@@ -48,7 +95,8 @@
          4. ExtClassLoader加载不到时AppClassLoader加载
          5. 避免重复加载类或者被恶意窜改
       4. Tomcat:
-3. GC
+
+4. GC
    1. 分类
       1. Young GC/Minor GC:新生代回收
       2. Old GC/Major GC:老年代回收
@@ -83,6 +131,7 @@
          5. 优点:降低内存碎片
          6. 缺点:效率不高
       4. 
-4. JVM调优(参数设置)
+
+5. JVM调优(参数设置)
    1. -Xms:堆的最小内存大小(1/64M)
    2. -Xmx:堆的最大内存大小(1/4M)

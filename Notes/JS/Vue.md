@@ -506,8 +506,6 @@ Vue
       //创建事件总线,进行数据通信
       Vue.prototype.$bus =new Vue()
       
-      
-      
       ```
 
     - ```vue
@@ -629,7 +627,19 @@ Vue
       </style>
       ```
 
-    - 
+    - 操作Dom元素
+
+      - 为元素设置ref属性,通过this.refs.xxx获取dom元素
+
+    - this.nextTick
+
+      - 实现dom加载完毕后回调函数
+
+    - ```js
+      this.$nextTick(()=>{
+      	this.$refs.inputRef.focus()
+      })
+      ```
 
 - 路由
 
