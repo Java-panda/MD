@@ -641,7 +641,110 @@ Vue
       })
       ```
 
+  - 动态组件
+
+    - ```vue
+      <keep-alive exclude="Right">//卸载是缓存,include,exclude包括或者排除的组件列表,二者只能选其一
+          <component :is="compName"></component>
+      </keep-alive>
+      ```
+
+  - 插槽
+
+    - ```vue
+      定义
+      <slot name="header" :data="obj">默认值</slot>
+      <slot name="content" :data="obj">默认值</slot>
+      <slot name="footer" :data="obj">默认值</slot>
+      ```
+
+    - ```vue
+      调用
+      <template slot="header" slot-scope="scope"> //写法一
+      	<p>{{scope.data.xxx}}</p>
+      </template>
+      <template #header="scope"> //写法二
+      	<p>{{scope.data.xxx}}</p>
+      </template>
+      ```
+
+  - 自定义指令
+
+    - ```js
+      Vue.directive('color',{
+        bind(el,binding){
+          console.log(el,binding);
+          el.style.color=binding.value
+        },
+        update(el,binding){
+          el.style.color=binding.value
+        }
+      })
+      
+      <div v-color="'red'"></div>
+      ```
+
 - 路由
+
+  - 本质上画面上锚点#的变化
+
+      - ```html
+        <template>
+          <div id="app">
+            <router-link to="/a">A</router-link><br>
+            <router-link to="b">B</router-link><br>
+            <router-link to="/c">C</router-link><br>
+            <hr>
+            <router-view></router-view>
+          </div>
+        </template>
+        ```
+
+      - ```js
+        // src/router/index.js
+        
+        import Vue from "Vue";
+        import VueRouter from "vue-router";
+        //使用路由插件
+        Vue.use(VueRouter)
+        //实例化路由插件
+        const router = new VueRouter()
+        //导出
+        export default router
+        ```
+
+  - 
+
+  - 动态路由
+
+    - ```js
+      /user/detail/1?name=lj&age=25
+      
+      
+      获取路径参数
+      //方式一
+      <div>ID:{{ this.$route.params.id }}</div>
+      //方式二通过路由配置中指定形参的props:true属性可以在组件内部通过属性值直接获取
+      <div>ID:{{id}}</div>
+      
+      //其他常用
+      <div>Name:{{this.$route.query.name}}</div>
+      <div>Age:{{this.$route.query.age}}</div>
+      <div>Path:{{this.$route.path}}</div>
+      <div>FullPath:{{this.$route.fullPath}}</div>
+      ```
+
+  - 导航
+
+      - ```js
+          this.$router.push("/path")
+          this.$router.replace("/path")
+          this.$router.go(n)//前进n,负数为倒退
+          this.$router.back()//倒退
+          this.$router.forward()//前进
+          ```
+
+      - 
 
 - Vuex
 
