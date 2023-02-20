@@ -701,16 +701,47 @@ Vue
         ```
 
       - ```js
-        // src/router/index.js
-        
-        import Vue from "Vue";
-        import VueRouter from "vue-router";
         //使用路由插件
         Vue.use(VueRouter)
         //实例化路由插件
-        const router = new VueRouter()
-        //导出
-        export default router
+        const router = new VueRouter({
+            routes:[
+                {
+                    path:"/",
+                    redirect:"/a"//重定向
+                },
+                {
+                    path:"/a",
+                    component:A
+                },
+                {
+                    path:"/b",
+                    component:B,
+                    redirect:"/b/b1",
+                    children:[
+                        {
+                            path:"b1",
+                            component:B1
+                        },
+                        {
+                            path:"b2",
+                            component:B2
+                        }
+                    ]
+                },
+                {
+                    path:"/c",
+                    component:C,
+                    children:[
+                        {
+                            path:"cc/:id",//动态路由
+                            component:CC,
+                            props:true//作为属性传给组件,组件内部需要声明该属性
+                        }
+                    ]
+                }
+            ]
+        })
         ```
 
   - 
@@ -744,7 +775,27 @@ Vue
           this.$router.forward()//前进
           ```
 
-      - 
+      - 导航守卫
+
+          - ```js
+              router.beforeEach((to,from,next)=>{
+                  if (to.path==='/带权限路径') {
+                      const token = sessionStorage.getItem('token')
+                      if (token) {
+                          //跳转到其他路径
+                          next('/指定路径')
+                      } else {
+                          //原地不动
+                          next(false)
+                      }
+                  } else {
+                      //直接放行
+                      next()
+                  }
+              })
+              ```
+
+          - 
 
 - Vuex
 
