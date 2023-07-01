@@ -133,4 +133,26 @@
          docker update redis --restart=always
          ```
 
-   5. 
+4. 安装Zookeeper
+
+   1. 下载Zookeeper
+
+      1. ```bash
+         docker pull zookeeper
+         ```
+
+   2. 启动zookeeper
+
+      1. ```
+         #创建数据存储目录
+         mkdir -p /usr/local/zookeeper/data
+         
+         docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v /usr/local/zookeeper/data:/data --name zookeeper --restart always zookeeper
+         ```
+   3. 连接zookeeper客户端
+   
+      1. ```bash
+         docker run -it --rm --link zookeeper:zookeeper zookeeper zkCli.sh -server zookeeper
+         ```
+   
+      2. 

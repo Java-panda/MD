@@ -1,3 +1,11 @@
+- 安装
+  - Windows
+    - https://github.com/tporadowski/redis/releases下载安装包，并解压，加入环境变量
+    - 修改配置可以默认不修改，如果要设置密码修改requirepass属性
+    - 启动服务
+      - redis-server --service-start redis.windows-service.conf
+    - 停止服务
+      - redis-server --service-stop
 - 缓存
   - 优点
     - 降低后端负载
