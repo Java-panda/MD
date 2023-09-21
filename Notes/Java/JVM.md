@@ -3,7 +3,16 @@
    1. 内存泄漏:没有用的对象未释放或者无法释放
    2. 内存溢出:内存空间不够了
 
-2. 引用类型
+2. 对象头
+
+   1. MarkWord
+      1. HashCode
+      2. 锁状态信息
+      3. 分代年龄
+   2. 类型指针
+   3. 数组长度
+
+3. 引用类型
 
    1. 强引用
 
@@ -48,7 +57,7 @@
          System.out.println(phantomReference.get());//回收
          ```
 
-3. 内存模型(本地虚拟计算一堆方法)
+4. 内存模型(本地虚拟计算一堆方法)
 
    1. 方法区
       1. 类信息
@@ -76,7 +85,7 @@
       3. StackOverflowError
          1. 栈帧过多,递归过深
 
-4. 类加载器
+5. 类加载器
    1. 步骤
       1. 加载
       2. 链接
@@ -93,7 +102,7 @@
          1. 加载自己APP中的类路径下targets
       4. WedbAppClassLoader(Tomcat)
          1. 
-   3. 双亲委派
+   3. 双亲委派（向上委派，向下加载）
       1. BootStrapClassLoader
       2. ExtClassLoader
       3. AppClassLoader
@@ -102,9 +111,9 @@
          3. BootStrapClassLoader加载不到时ExtClassLoader加载
          4. ExtClassLoader加载不到时AppClassLoader加载
          5. 避免重复加载类或者被恶意窜改
-      4. Tomcat:
+      4. 打破双亲委派的方法:
 
-5. JVM常用指令
+6. JVM常用指令
 
    1. java -c <class>
    2. java -jar <class>
@@ -112,7 +121,7 @@
    4. jstack:查看某个进程的执行
    5. jconsole:查看某个进程的线程信息
 
-6. GC
+7. GC
 
    1. 分类
       1. Young GC/Minor GC:新生代回收
@@ -165,6 +174,6 @@
       1. 对象销毁前判断是否需要执行该方法,如果需要则加入F-Queue等待执行,但不保证一定执行到,比如执行消耗时间太多可能已经被销毁,一个对象最多只能执行一次
       2. 类比死刑枪毙前写信或者打电话进行申诉,信还没到就被销毁或者电话打完再次免死,一个人只有一次免死机会
 
-7. JVM调优(参数设置)
+8. JVM调优(参数设置)
    1. -Xms:堆的最小内存大小(1/64M)
    2. -Xmx:堆的最大内存大小(1/4M)

@@ -12,7 +12,8 @@
 
    ​	Myisam:18(存在文件)
 
-2. 事务
+
+1. 事务
 
    1. ACID
 
@@ -66,6 +67,20 @@
 
       1. set tx_isolation='Read-Uncommitted','Read-Comimitted','Repeatable-Read','Serializable',
 
+2. InnoDB和Myisam存储文件后缀格式
+
+   1. InnoDB
+      1. ibd
+
+      2. frm（8.0废弃）
+
+   2. Myisam
+      1. frm（8.0sdi）
+
+      2. myd
+
+      3. myi
+
 3. MVCC(multi-version-concurrent-control)多版本并发控制
 
    1. 当前读
@@ -95,7 +110,7 @@
    3. unique:唯一索引(唯一,可空)
    4. composite index:组合索引(组合唯一,第一个索引时才可生效)
    5. fulltext:全文索引(char,varchar,text的关键字搜索)
-   
+
 6. Mysql索引失效场景
 
    ``` sql
@@ -188,4 +203,28 @@
       5. Using filesort:需要外部排序,一般需要优化
       6. Select tables optimized away:对索引列使用了某些函数
 
-   
+8. SQL优化
+
+   1. 什么是慢查询
+
+      1. 查询时间长，超过阈值
+
+   2. 导致慢查询的可能原因
+
+      1. 子查询，连接查询嵌套过多
+      2. 没有设计好合适的索引，导致全表扫描
+      3. 本身数据量太大，考虑分库分表
+      4. 表结构设计不合理，字段重复，冗余过多
+
+   3. 开启慢查询日志
+
+      1. ```bash
+         # 开启慢查询日志
+         slow_query_log = 1
+         # 慢查询日志文件的路径和名称
+         slow_query_log_file = D:/mysql-8.0.33-winx64/log/slow-query.log
+         # 定义查询执行时间超过多少秒才被认为是慢查询（可以根据实际需求进行调整）
+         long_query_time = 2
+         ```
+
+      2. 

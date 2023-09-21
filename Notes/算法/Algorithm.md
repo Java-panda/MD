@@ -1,6 +1,37 @@
 # 算法
 
-1. 算法复杂度
+1. 算法内功
+
+   1. 算法是基于数据结构的增删改查
+
+   2. 数据结构本质分类
+      1. 线形结构（1对1）
+         1. 结构分类
+            1. 数组
+
+            2. 链表
+
+         2. 特性分类
+            1. 栈
+            2. 队列
+
+      2. 树形结构（1对n）
+         1. 二叉树
+
+         2. 多叉树
+
+      3. 图形结构（m对n）
+         1. DFS
+
+         2. BFS
+
+   3. 算法基本构成
+      1. 顺序
+      2. 循环
+      3. 分支
+      4. 递归
+
+2. 算法复杂度
 
    1. 时间复杂度(Time Complexity)
       1. 常数项忽略
@@ -8,7 +39,7 @@
       3. 系数项忽略
    2. 空间复杂度(Space Complexity)
 
-2. 数据结构的本质
+3. 数据结构的本质
 
    - 数组
      - 顺序存储
@@ -17,10 +48,10 @@
      - 链式存储
      - 查询慢,增删快
 
-3. 算法的本质
+4. 算法的本质
    - 以数据结构为基础对数据进行增,删,改,查
 
-4. 经典排序算法
+5. 经典排序算法
 
    1. Bubble Sort
 
@@ -268,14 +299,14 @@
       }
       ```
 
-5. 查找算法
+6. 查找算法
 
    1. 线性查找
    2. 二分查找
    3. 插值查找
    4. 斐波那契查找
 
-6. 树
+7. 树
 
    1. 基本用语
 
@@ -344,65 +375,317 @@
 
       1. 在B+树的基础上增加非叶子节点之间的兄弟指针
 
-7. 图
+8. 图
 
-   1. 分类
+   1. 基本概念
 
-      1. 无向图
-      2. 有向图
+      1. 顶点：vertex
+
+      2. 边：edge
+
+      3. 路径：点到点对应边的连线
+
+      4. 有向(AB≠BA)/无向(AB=BA)
+
+      5. 权值：边的长度
 
    2. 表示方法
 
       1. 邻接矩阵
 
-         ![image-20220919230136033](C:\Users\77023\Desktop\MD笔记\MD\Notes\算法\images\image-20220919230136033.png)
+         ![](I:\Jpanda\MD\MD\Notes\算法\images\image-20220919230136033.png)
 
       2. 邻接表
 
-         ![image-20220919230512646](C:\Users\77023\Desktop\MD笔记\MD\Notes\算法\image-20220919230512646.png)
+         ![](I:\Jpanda\MD\MD\Notes\算法\images\image-20220919230512646.png)
 
    3. 图的遍历
 
       1. DFS(深度优先)
       2. BFS(广度优先)
 
-8. 算法模板
+   4. 图的常用算法
 
-   1. 回溯算法
+      1. 普利姆算法(最小生成树)
+      2. 克鲁斯卡尔算法
+      3. 迪杰斯特拉算法
+      4. 弗洛伊德算法
 
-      解决决策树遍历问题
+9. 算法模板
 
-      三大要素
+   1. 回溯模板
 
-      1. 路径:已经做出的选择
-      2. 选择列表:接下来可做的选择
-      3. 结束条件:到达决策树叶子节点
+   ```java
+   // 枚举所有
+   void backTrace(int[] nums,List<Integer> paths){
+       // 结束条件
+       if (paths.size()== nums.length){
+           rets.add(new ArrayList<>(paths));
+           return;
+       }
+       for (int i = 0; i < nums.length; i++) {
+           // 剪支
+           if (paths.contains(nums[i])){
+               continue;
+           }
+           // 选择路径
+           paths.add(nums[i]);
+           // DFS
+           backTrace(nums,paths);
+           // 回溯
+           paths.remove(paths.size()-1);
+       }
+   }
+   
+   // 枚举第一个满足条件的
+   boolean backTrace(int[] nums,List<Integer> paths){
+       // 结束条件
+       if (paths.size()== nums.length){
+           rets.add(new ArrayList<>(paths));
+           return true;
+       }
+       for (int i = 0; i < nums.length; i++) {
+           // 剪支
+           if (paths.contains(nums[i])){
+               continue;
+           }
+           // 选择路径
+           paths.add(nums[i]);
+           // DFS
+           if(backTrace(nums,paths)){
+               return true;
+           };
+           // 回溯
+           paths.remove(paths.size()-1);
+       }
+       return false;
+   }
+   ```
 
-      模板
+   - 典型题型
 
-      ``` java
-      /**
-       *回溯算法基本模板
-       *
-       */
-      //最终路线结果集
-      private  static List<List<Integer>> resultList= new ArrayList<List<Integer>>();
-      public static void backTrace(int[] choices,List<Integer> route){
-          // 结束条件
-          if (route.size()==choices.length){
-              resultList.add(new ArrayList<Integer>(route));
-              return;
-          }
-          // 遍历选择列表
-          for (Integer choice:choices){
-              // 做选择(剪枝)
-              route.add(choice);
-              // 回溯
-              backTrace(choices,route);
-              // 撤销选择
-              route.remove(route.size()-1);
-          }
-      }
-      ```
-      
-      123
+     - 子集
+
+       - 结束条件：没有
+       - 路径列表：index控制选择范围
+
+     - 排列
+
+       - 结束条件：选择列表选完
+       - 剪支：保证没有用过
+       - 路径列表：全体
+
+     - 组合
+
+       - 结束条件：选择了k个元素时
+       - 路径列表：index控制选择范围
+
+     - ```
+       1.组合问题中如果是排列问题则应该是用contains保证不重用，不使用index定位，即AB!=BA
+       2.如果是组合问题则应该使用定向index来保证顺序，即AB=BA
+       3.子集问题本质相当于所有组合问题的全集，也就是k从0-n的全部合集
+       ```
+
+     - N皇后
+
+       - 结束条件：第n层皇后摆放结束
+       - 剪支：保证该位置是否可以放皇后(左上，上，右上均不能有棋子)
+       - 路径列表：棋盘的每一行的1-n列可以任意选
+
+     - 数独
+
+       - 结束条件：第9层数字摆放结束
+       - 剪支：保证该位置是否可以放该数字(横，竖，九宫格内不能包含相同数字)
+       - 路径列表：1-9
+
+     - 马踏棋盘
+
+       - 结束条件：跳了N*N次
+       - 剪枝：尽可能选择下一步对应的走法数量最少的分枝
+       - 路径列表：马走日字对应的八个方向
+
+     - ```
+       1.N皇后和数独问题本质均为暴力枚举，因而，如果只想获取一组答案，则一般需要将回溯递归体返回值定义为boolean类型如若想枚举所有可能，则使用void返回类型不加限制
+       2.本质原理使用boolean后，相当于dfs中找到一个树枝以后不断向上返回，最终结束，若不返回，则会回溯整棵树
+       ```
+   2. 滑动窗口模板
+
+      1. 模板打油诗
+
+         ```
+         滑动窗口
+         
+         左右指针从零跑，目标窗口要定好。
+         外环右针向右进，窗口直到大小尽。
+         内环左针随后追，移出窗口最小堆。
+         中间变量适当加，最后求出指针差。
+         ```
+
+      2. ```java
+         int[] nums;
+         int left=0;
+         int right=0;
+         target
+         window
+         while(right<nums.length){
+             rightValue = nums[right];
+             window.put(rightValue);
+             right++;
+             while(left<right && window要收缩){
+         	    leftValue = nums[left];
+             	window.remove(leftValue);
+             	left++;
+             }
+         }
+         ```
+
+         
+
+10. 算法技巧
+
+    1. 数组
+
+       1. 如何知道一个无序数组中能找到的最大连续的序列包含的元素个数
+
+          1. 如果没有时间复杂度要求则可以先排序，转为下一个问题
+
+          2. 如果元素个数不是特别巨大，则可以使用Set集合将其去重，然后依次遍历该set集合中的每个元素，找到每一个序列左端点，然后while步进1步的方式确定该序列的最大长度，满足左端点的元素e一定满足条件e-1不在当前set集合中
+
+          3. 核心代码逻辑
+
+             ```java
+             //所求答案
+             int ret =1;
+             for(Integer e : set){
+                  //存在比e还靠左的端点，直接下一位
+             	if(set.contains(e-1)){
+             		continue;
+             	}
+             	//当前子序列的最大个数
+             	int count =1;
+                 //步进循环求得最大连续个数
+             	while(set.contains(e+1)){
+             		count++;
+             		e++;
+             	}
+                 ret = Math.max(ret,count);
+             }
+             ```
+
+       2. 如何知道一个有序数组中能找到的最大连续的序列包含的元素个数
+
+          1. 有序的状态下，我们只需要使用连续两位数字进行递进比较，类似于冒泡排序的内层循环nums[i]和nums[i-1]进行比较
+
+          2. 如果相等，则跳过进行下一位比较，如果nums[i]=nums[i-1]+1则有效长度+1，否则重置计数器，进入下一位比较
+
+          3. 核心代码逻辑
+
+             ```java
+             int ret =1;
+             
+             int count =1;
+             for(int i=1;i<nums.length;i++){
+                 //如果相等，则跳过进行下一位比较
+                 if(nums[i]==nums[i-1]){
+                     continue;
+                 }else if(nums[i]==nums[i-1]+1){
+                     //有效长度+1
+                     count++;
+                     ret = Math.max(ret,count);
+                 }else{
+                     //重置计数器
+                     count =1;
+                 }
+             }
+             
+             //升华
+             
+             /**
+             *此题使用的基本模型可以定义为nums[i]和nums[i-1]的连续等差比较模型，即判断连续两个元素的关系
+             *如：
+             *冒泡排序模型比较两个元素大小关系
+             *本例比较两个元素的等量关系
+             */
+             ```
+
+             
+
+    2. 双指针
+
+       1. 快慢指针
+
+          1. 将数组中的所有某个元素A移动到数组最后，其他元素相对位置不变
+
+             1. 相当于从所有元素中顺序找到所有不是A的元素，并用一个slow指针随时指向当前能够放入的位置，再用一个快指针fast遍历整个数组
+
+             2. 核心逻辑代码
+    
+                ```java
+                //注意slow指针指向下一个可以存放非A元素的索引，fast指针负责遍历整个数组
+                int slow = 0;
+                for(int fast =0;fast <nums.length;fast++){
+                    //寻找下一个非A元素
+                    if(nums[fast]==A){
+                        continue;
+                    }else{
+                        //找到非A元素，即和slow交换元素位置
+                        swap(nums,slow,fast);
+                        //slow指向下一个可以存放非A元素的索引
+                        slow++;
+                    }
+                }
+                
+                
+                //升华
+                //如果把所有A元素移到最后呢，其他条件不变，则只需要快慢指针从nums.length-1倒序处理即可	
+                ```
+             
+    
+       2. 前后夹逼指针
+    
+          1. 三数之和
+    
+    3. 链表
+    
+       1. 反转一个链表
+    
+          1. 反转链表的模型本质可以理解为将A→B→C转化为C→B→A，因为任何一个链表我们可以抽象结构为，前驱→当前结点→后驱
+    
+          2. 然后使用基本的链表增删模型操作即可
+    
+          3. 核心逻辑代码
+    
+             ```java
+             //初始状态理解为A为null，B为根节点root，C为根节点后驱
+             Node head=null;
+             while(root!=null){
+                 //当前节点后驱临时存起来
+                 Node tail = root.next;
+                 //更新当前结点后驱为前驱结点
+                 root.next = head;
+                 //更新新的前驱结点
+                 head = root;
+                 //更新新的根节点
+                 root =next;
+             }
+             
+             
+             //升华
+             /**
+             *链表增删查改基本操作
+             *1.A，B之间增加结点C，先将B临时当作tempB保存起来，然后A.next指向C，C.next指向tempB
+             *2.A，C之间删除结点B，先将C临时当作tempC保存起来，然后A.next指向tempC
+             *3.获取A，B结点中的A结点，并去掉其next结点，先将B结点保存起来，然后让A.next指向null
+             *4.修改A结点的值，遍历找到A结点然后A.val=新值
+             */
+             ```
+    
+             
+    
+    4. 栈
+    
+    5. 二叉树
+    
+    6. 图
+    
+    7. 动态规划
