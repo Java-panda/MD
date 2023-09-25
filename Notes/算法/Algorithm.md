@@ -516,7 +516,7 @@
          滑动窗口
          
          左右指针从零跑，目标窗口要定好。
-         外环右针向右进，窗口直到大小尽。
+         外环右针向右进，直到窗口大小尽。
          内环左针随后追，移出窗口最小堆。
          中间变量适当加，最后求出指针差。
          ```
@@ -538,8 +538,13 @@
              }
          }
          ```
+   3. 动态规划模板
 
-         
+      1. 动态规划的本质就是已知数列首项a1以及an和an-1的递推公式，求an的过程，而如何设计一个合理的an便是设计合理状态的过程，而求解动态规划的本质就是暴力迭代求数列an值的过程
+      2. 动态规划的三大要素
+         1. 状态：an的含义
+         2. 状态转移方程：an和an-1的递推公式
+         3. 初始值：a0
 
 10. 算法技巧
 
@@ -608,16 +613,87 @@
              */
              ```
 
+       3. 合并
+
+          1. 以数组 `intervals` 表示若干个区间的集合，其中单个区间为 `intervals[i] = [starti, endi]` 。请你合并所有重叠的区间，并返回 *一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间* 。
+
+          2. 考虑将原数组按照start升序排序
+
+          3. 数组两两比较记为ab和cd，已知排完序后c>=a
+
+          4. 分类讨论
+
+             1. 如果d<=b那么合并后结果为ab
+             2. 如果c<=b同时d>b那么合并后为ad
+             3. 如果c>b那么合并后ab，cd不变
+    
+          5. 由上面的分析可以知道，4.1和4.2中会进行合并，合并后的结果和下一个再次进行比较合并，因此不确定是否可以加入结果集，但是4.3中的ab一定不会再次发生合并，因而可以加入结果集，所以得出结论，只有在4.3的情况下像结果中加入ab，直到所有循环结束，此时最后一个cd需要加入结果集
+    
+          6. 核心逻辑代码
+    
+             ```java
+             //排序
+             Arrays.sort(intervals,(a,b)->{
+                 return a[0]!=b[0]?a[0]-b[0]:a[1]-b[1];
+             });
+             List<int[]> list = new ArrayList<>();
+             int i=0;
+             for(i=0;i<intervals.length-1;i++){
+                 //如果d<=b那么合并后结果为ab
+                 if(intervals[i+1][1]<=intervals[i][1]){
+                     //每次将下一次的比较对象移到i+1的位置
+                     intervals[i+1][0]=intervals[i][0];
+                     intervals[i+1][1]=intervals[i][1];
+                 }else if(intervals[i+1][1]>intervals[i][1] && intervals[i+1][0] <=intervals[i][1]){
+                     //如果c<=b同时d>b那么合并后为ad
+                     intervals[i+1][0]=intervals[i][0];
+                 }else{//如果c>b那么合并后ab，cd不变
+                     list.add(intervals[i]);
+                 }
+             }
+             //最后一个cd需要加入结果集
+             list.add(intervals[i]);
+             return list.toArray(int[][]::new);
              
-
+             
+             
+             //可以借鉴一下使用Stack的写法
+             //方法二.栈
+             Arrays.sort(intervals,(a,b)->{
+                 return a[0]!=b[0]?a[0]-b[0]:a[1]-b[1];
+             });
+             Stack<int[]> stack = new Stack<>();
+             stack.push(intervals[0]);
+             
+             for(int i=1;i<intervals.length;i++){
+                 //a=pop[0] b=pop[1]
+                 int[] pop =stack.pop();
+             
+                 //c=intervals[i][0] d=intervals[i][1]
+                 //d<=b
+                 if(intervals[i][1]<=pop[1]){
+                     stack.push(pop);
+                 }else if(intervals[i][1]>pop[1] && intervals[i][0] <=pop[1]){//c<=b && d>b
+                     pop[1]=intervals[i][1];
+                     stack.push(pop);
+                 }else{//c>b
+                     stack.push(pop);
+                     stack.push(intervals[i]);
+                 }
+             }
+             return stack.stream().toArray(int[][]::new);
+             ```
+    
+             
+    
     2. 双指针
-
+    
        1. 快慢指针
-
+    
           1. 将数组中的所有某个元素A移动到数组最后，其他元素相对位置不变
-
+    
              1. 相当于从所有元素中顺序找到所有不是A的元素，并用一个slow指针随时指向当前能够放入的位置，再用一个快指针fast遍历整个数组
-
+    
              2. 核心逻辑代码
     
                 ```java
@@ -643,7 +719,117 @@
     
        2. 前后夹逼指针
     
-          1. 三数之和
+          1. 两数之和/三数之和
+    
+             1. 如果不需要返回索引下标则可以直接排序后，前后夹逼双指针
+    
+             2. 核心逻辑代码
+    
+                ```java
+                int target;
+                int[] nums;
+                int second = nums.length-1;
+                for(int first=0;first<second;first++){
+                    //避免重复结果集
+                    if(first!=0 && nums[first]==nums[first-1]){
+                        continue;
+                    }
+                    while(first<second && nums[first]+nums[second]>target){
+                        second--;
+                    }
+                    if(first<second && nums[first]+nums[second]==target){
+                        //加入结果集
+                    }
+                }
+                
+                
+                //升华
+                //这是夹逼双指针的基础模板，务必熟练写出
+                ```
+          2. 盛最多水的容器
+    
+             1. 本质在于求数组中任意两个元素和对应值作为高之间围成的区域能盛放的最大水量
+    
+             2. 最大水量=(right-left)**Min*(nums[left],nums[right])
+    
+             3. 判断左右指针递进的逻辑为率先移动值较小的一方，不然的话，假若先移动较大值一方，那么接下来无论如何移动都不会使得新的面积大于当前面积，因为该策略一定是错的，那么反之则一定是对的
+    
+             4. 核心逻辑代码
+    
+                ```java
+                int[] nums
+                int maxArea=0;
+                //定义左右指针
+                int left=0;
+                int right=nums.length-1;
+                while(left<right){
+                    //面积(盛水量)计算公式
+                	int area = (right-left)*Math.Min(nums[left],nums[right]);
+                	maxArea =Math.max(maxArea,area);
+                	//指针递进逻辑，更新较小者的指针递进
+                	if(nums[left]<nums[right]){
+                		left++;
+                	}else{
+                		right--;
+                	}
+                }
+                ```
+    
+                
+    
+       3. 滑动窗口
+    
+          1. 找到字符串中所有字母异位词
+    
+             1. 直接套前文打油诗模板
+    
+             2. 核心逻辑代码
+    
+                ```java
+                List<Integer> rets = new ArrayList<>();
+                 //左右指针从零跑
+                 int left =0;
+                 int right =0;
+                 //目标窗口要定好
+                 Map<Character,Integer> target = new HashMap<>();
+                 Map<Character,Integer> window = new HashMap<>();
+                 for(int i=0;i<p.length();i++){
+                     target.put(p.charAt(i),target.getOrDefault(p.charAt(i),0)+1);
+                 }
+                
+                 int coverSize =0;
+                 //外环右针向前进
+                 while(right<s.length()){
+                     char rightValue = s.charAt(right);
+                     window.put(rightValue,window.getOrDefault(rightValue,0)+1);
+                     right++;
+                     if(window.get(rightValue).equals(target.get(rightValue))){
+                         coverSize++;
+                     }
+                     //直到窗口大小尽
+                     while(left<right && window.get(rightValue)>target.getOrDefault(rightValue,0)){
+                         //内环左针随后追
+                         char leftValue = s.charAt(left);
+                         if(window.get(leftValue).equals(target.get(leftValue))){
+                             coverSize--;
+                         }
+                         //移除窗口最小堆
+                         window.put(leftValue,window.getOrDefault(leftValue,0)-1);
+                         left++;
+                     }
+                
+                     //中间变量适当加
+                     if(coverSize == target.size()){
+                         //最终求出指针差
+                         rets.add(left);
+                     }
+                 }
+                 return rets;
+                
+                //这是滑动窗口的基础模板，应当熟练掌握
+                ```
+    
+                
     
     3. 链表
     
@@ -682,10 +868,219 @@
     
              
     
-    4. 栈
+    4. 队列
     
-    5. 二叉树
+       1. 优先队列
     
-    6. 图
+          1. 滑动窗口最大值：给你一个整数数组 `nums`，有一个大小为 `k` 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 `k` 个数字。滑动窗口每次只向右移动一位。
     
-    7. 动态规划
+          2. 首先想到定长为k的滑动窗口，每次循环比较k个元素的最大值，这样时间复杂度nk，尝试后超时
+    
+          3. 借助优先队列的大顶堆排序特性，逐个加入nums中的元素，最大值一定会在堆顶
+    
+          4. 使用{nums[i],i}作为整体放入堆中，当加入第k+1个元素时，如果对顶是滑动窗口左边界以外的元素，则不断出堆
+    
+          5. 核心逻辑代码
+    
+             ```java
+             //注意，新的数组大小应当nums.length-k+1，可以找下规律简单推理
+             int[] rets = new int[nums.length-k+1];
+             //定义按值大顶堆排序，如果值相等则按照索引靠后的优先，这也可以避免频繁的移除左边界以外的最大值
+             PriorityQueue<int[]> priorityQueue = new PriorityQueue<>((a,b)->{
+                 if(a[0]!=b[0]){
+                     return b[0]-a[0];
+                 }else{
+                     return b[1]-a[1];
+                 }
+             });
+             //前k-1个元素无需任何操作直接加入队列中
+             for (int i = 0; i < k-1; i++) {
+                 priorityQueue.offer(new int[]{nums[i],i});
+             }
+             //第k个元素开始，每加一个元素均要判断当前堆顶最大值是否超出左边界，超出则出堆
+             for (int i = k-1; i < nums.length ; i++) {
+                 //第一个存值，第二个存索引
+                 priorityQueue.offer(new int[]{nums[i],i});
+                 //判断是否越过左边界，只需要算出左边界x，x满足i-x+1=k推出x=i+1-k
+                 while(priorityQueue.peek()[1]<(i+1-k)){
+                     //出堆
+                     priorityQueue.poll();
+                 }
+                 //逐个加入最大值到结果集，注意索引表达式应该同上为左边界x
+                 rets[i+1-k]=priorityQueue.peek()[0];
+             }
+             return rets;
+             
+             
+             //升华
+             //熟悉PriorityQueue构造函数中的Comparator自定义比较器写法
+             //顺便学习掌握PriorityQueue的基本用法offer,peek,pop,poll
+             //此题索引边界值较多，做题时适当假设值同时熟练掌握等差项数=(ai-ak)/d+1计算公式
+             ```
+    
+             
+    
+    5. 栈
+    
+       1. 单调栈
+    
+          1. 接雨水的单调栈
+    
+             1. 若要能储水，则必须产生凹槽，对应函数图像即产生向上转折
+    
+             2. 从左到右遍历数组，将nums[i]的索引逐个加入Stack中，如果Stack为空或者当前值<=栈顶元素，则继续加入栈，直到出现第一个比栈顶元素达的元素（加数组索引的原因是不仅可以获取索引值也能获取索引对应的数组值，后续面积计算需要计算索引差值，因而保留索引）
+    
+             3. 然后判断栈元素个数>=2的时候才会产生凹槽，否则一定是直接单调递增，那么当前元素左边的均应该弹出栈
+    
+             4. 弹出栈顶top，同时判断栈此时是否为空，为空说明一直单调递增，那么因该弹出前面的元素，不为空则查看栈元素作为left
+    
+             5. 逐个消除凹槽，并计算对应的面积值，S+=(i-left-1)*(Min(nums[i],nums[left])-nums[top])
+    
+             6. 核心代码逻辑
+    
+                ```java
+                int[] nums;
+                int area=0;
+                Stack<Integer> stack = new Stack<>();
+                for(int i=0;i<nums.length;i++){
+                    //当出现凹槽向上，则循环计算前面所有符合凹槽的点的储水量
+                    while(!stack.isEmpty() && nums[i]>nums[stack.peek()]){
+                        //拿到栈顶元素索引，作为即将计算面积的点
+                        Integer top = stack.pop();
+                        //如果等于空说明栈中只有一个元素，那么此时nums[i]>nums[stack.peek()]则说明栈单调递增，不合要求
+                        if(!stack.isEmpty()){
+                            area += (i-left-1)*(Min(nums[i],nums[left])-nums[top])
+                        }
+                    }
+                    stack.push(i);
+                }
+                
+                //栈的作用真的很神奇，但是栈的操作原理有真的很抽象，多做，多理解，多感悟吧
+                ```
+    
+                
+    
+    6. 二叉树
+    
+    7. 图
+    
+    8. 动态规划
+    
+       1. 基础递推
+    
+          1. 接雨水的动态规划法
+    
+             1. 某个点的储水量由该点左边的最大值和右边的最大值的相对较小（短板）决定
+    
+             2. 上述求得的较小的短板值-该点的高度，如果结果>0，则该值就是储水量，如果<0则说明此处无法盛水，即储水量为0
+    
+             3. 某点储水量=Max(Min(Max(height[0]~height[i-1]),Max(height[i+1]~height[height.length-1]))-height[i],0)
+    
+             4. 核心逻辑代码
+    
+                ```java
+                
+                int[] nums;
+                int[] leftMax = new int[nums.length];
+                //动态规划求每个点对应左边的最大值列表
+                leftMax[0]=0;//数列base值
+                for(int left=1;left<nums.length;left++){
+                    //数列递推公式
+                    leftMax[i]=Math.max(leftMax[i-1],nums[i-1]);
+                }
+                int[] rightMax = new int[nums.length];
+                rightMax[nums.length-1]=0;//数列base值
+                //动态规划求每个点对应右边的最大值列表
+                for(int right=nums.length-1;right>=0;right--){
+                    //数列递推公式
+                    rightMax[right]=Math.max(rightMax[right+1],nums[right+1]);
+                }
+                
+                //储水量
+                int sum =0;
+                for(int i=1;i<nums.length;i++){
+                	sum+=Math.max(Math.min(leftMax[i],rightMax[i])-nums[i],0);
+                }
+                ```
+    
+          2. 最大子数组和
+    
+             1. 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+    
+             2. 首先想到暴力枚举，那么显然需要n3的时间复杂度，显然不可取
+    
+             3. 其次如果考虑前缀和计算出数组的前缀和的话，会发现显然还需要n2的时间复杂度，也不尽人意
+    
+             4. 最后如果考虑动态规划则问题得到巧妙地解决
+    
+                1. 状态定义dp[i]：以nums[i]结尾的子数组的最大和值
+    
+                2. 状态转移方程：dp[i]=dp[i-1]<=0?nums[i]:nums[i]+dp[i-1]
+    
+                3. 初始状态：dp[0]=nums[0]
+       
+             5. 核心逻辑代码
+       
+                ```java
+                dp[0]=nums[0];
+                //最大连续子数组和值
+                int maxSum=dp[0];
+                for(int i=1;i<nums.length;i++){
+                    dp[i]=dp[i-1]<=0?nums[i]:nums[i]+dp[i-1];
+                	maxSum=Math.max(maxSum,dp[i]);
+                }
+                return maxSum;
+                
+                //优化
+                //由题目可知,每个dp[i]元素都只是在不断前进的过程中被立刻使用,不存在回表反复查询,故可以使用双变量交替,降低空间复杂度
+                int before=nums[0];
+                int maxSum=before;
+                for(int i=1;i<nums.length;i++){
+                    before=before>0?before+nums[i]:nums[i];
+                    maxSum =Math.max(maxSum,before);
+                }
+                return maxSum;
+                
+                //升华
+                //本题旨在理解动态规划做题过程，同时掌握解题基本流程和套路
+                ```
+       
+                
+       
+       2. 前缀和
+       
+          1. 和为K的子数组
+       
+             1. 基本想法使用双指针枚举所有组合[i-j]，然后计算sum[i-j],但是这样时间复杂度n3，显然不是最佳方法
+       
+             2. 考虑sum[i-j]=sum[j]-dum[i-1]满足前缀和，则可以先用dp求出sum[i]=sum[i-1]+nums[i-1]
+       
+             3. 然后再次使用双指针枚举，此时求和计算省去o(n),因而时间复杂度变为n2
+       
+             4. 此时可以看出还符合两数之和的模型，只不过这里是两数之差，稍微变形即可
+       
+             5. 核心逻辑代码
+       
+                ```java
+                // 前缀和+哈希(类似两数之和的策略) O(n)+O(n)
+                int[] sum =new int[nums.length+1];
+                int count=0;
+                for(int i=1;i<sum.length;i++){
+                    //前缀和动态规划
+                    sum[i]=sum[i-1]+nums[i-1];
+                }
+                Map<Integer,Integer> map = new HashMap<>();
+                for(int i=0;i<sum.length;i++){
+                    //参考两数字和，只不过两数之和这里应该是k-sum[i]
+                    if(map.containsKey(sum[i]-k)){
+                        count+=map.get(sum[i]-k);
+                    }
+                    //两数之和求得是元素索引，同时保证答案唯一，所以此处value存的是索引
+                    //但是本体求的是满足条件的所有个数，因而将key进行计数，从而得到全部个数
+                    map.put(sum[i],map.getOrDefault(sum[i],0)+1);
+                }
+                
+                return count;
+                ```
+       
+                
