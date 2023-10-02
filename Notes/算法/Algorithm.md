@@ -642,6 +642,36 @@
 
                    
 
+       2. [搜索二维矩阵 II](https://leetcode.cn/problems/search-a-2d-matrix-ii/)
+
+          1. 方法
+
+             1. 每行二分查找效率较低
+             2. 逐行排除法，选择左下角->右上角的元素逐一对比(右上角->左下角方法类似)
+                1. 如果matrix(row,col)<target:col++
+                2. 如果matrix(row,col)>target:row--
+
+          2. 核心逻辑代码
+
+             ```java
+             //当matrix[row][col]>target则matrix[row][col]的第row行全不符合排除
+             //当matrix[row][col]<target则matrix[row][col]的第col列全不符合排除
+             int row =matrix.length-1;
+             int col =0;
+             while(row>=0 && col<matrix[0].length){
+                 if(matrix[row][col]==target){
+                     return true;
+                 }else if (matrix[row][col]>target){
+                     row--;
+                 }else{
+                     col++;
+                 }
+             }
+             return false;
+             ```
+
+             
+
     2. 数组
 
        1. 如何知道一个无序数组中能找到的最大连续的序列包含的元素个数
@@ -1000,7 +1030,7 @@
                  //更新新的前驱结点
                  head = root;
                  //更新新的根节点
-                 root =next;
+                 root =root.next;
              }
              
              
@@ -1012,6 +1042,339 @@
              *3.获取A，B结点中的A结点，并去掉其next结点，先将B结点保存起来，然后让A.next指向null
              *4.修改A结点的值，遍历找到A结点然后A.val=新值
              */
+             ```
+
+             
+
+       2. 正序复制或者逆序复制一个链表并保持原链表结构不变
+
+          1. 正序复制
+
+             ```java
+             public static ListNode copy(ListNode root) {
+                 //虚拟头节点，用于得到新的头节点
+                 ListNode dummy=new ListNode(0);
+                 //尾结点
+                 ListNode tail =dummy;
+             
+                 while(root!=null){
+                     //复制一个新的同值结点
+                     ListNode node =new ListNode(root.val);
+                     //把新节点加到尾部的next
+                     tail.next=node;
+                     //更新尾结点
+                     tail=tail.next;
+                     //下一个节点
+                     root=root.next;
+                 }
+                 //返回虚拟结点的下一个节点
+                 return dummy.next;
+             }
+             ```
+
+             
+
+          2. 逆序复制
+
+             ```java
+             public static ListNode reverseCopy(ListNode root) {
+                 //新链表
+                 ListNode tail=null;
+                 
+                 while(root!=null){
+                     //复制一个新的同值结点
+                     ListNode node =new ListNode(root.val);
+                     //新节点的next更新为之前的新链表
+                     node.next=tail;
+                     //更新新链表
+                     tail=node;
+                     //下一个
+                     root=root.next;
+                 }
+                 return tail;
+             }
+             ```
+
+             
+
+       3. Floyd判圈算法：判断一个链表是否有环，环的起始结点，环的长度，起点到环起点的距离
+
+          1. 基本原理
+
+             1. 设置快慢指针slow和fast同时从原点开始，slow指针每次走一步，fast每次走2步，当二者第一次相遇后，将fast重新放回原点，则下一次相遇时就是相遇的结点
+             2. ![image-20231001140324352](C:\Users\liuji\AppData\Roaming\Typora\typora-user-images\image-20231001143204414.png)
+
+          2. 判断是否有环
+
+             ```java
+             public boolean haveLoop(ListNode head){
+                 ListNode slow =head;
+                 ListNode fast =head;
+                 while(fast!=null && fast.next!=null){
+                     slow=slow.next;
+                     fast=fast.next.next;
+                     if(slow==fast){
+                         return true;
+                     }
+                 }
+                 return false;
+             }
+             ```
+
+          3. 环的起点
+
+             ```java
+             public ListNode startNode(ListNode head){
+                 ListNode slow =head;
+                 ListNode fast =head;
+                 //记录是否有环
+                 boolean haveLoop =false;
+                 while(fast!=null && fast.next!=null){
+                     slow=slow.next;
+                     fast=fast.next.next;
+                     if(slow==fast){
+                         //遇到环直接重置fast
+                         fast=head;
+                         haveLoop =true;
+                         break;
+                     }
+                 }
+                 if(!haveLoop){
+                     return null;
+                 }
+                 while(fast!=slow){
+                     slow=slow.next;
+                     fast=fast.next;
+                 }
+                 return fast;
+             }
+             ```
+
+          4. 环的长度
+
+             ```java
+             public int lenToLoopNode(ListNode head){
+             	//同3中的逻辑但是相遇后fast不重置原点而是继续跑一圈计算长度
+                 //...
+                 //用一个变量记录长度
+                 int len =1;
+                 while((fast=fast.next)!=slow){
+                     len++;
+                 }
+                 return len;
+             }
+             ```
+
+          5. 原点到环入口的距离
+
+             ```java
+             public int lenToLoopNode(ListNode head){
+             	//同3中的逻辑
+                 //...
+                 //重置fast到原点后，用一个变量记录长度
+                 int len =1;
+                 while(fast!=slow){
+                     len++;
+                     slow=slow.next;
+                     fast=fast.next;
+                 }
+                 return len;
+             }
+             ```
+
+       4. [合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)
+
+          1. 参考数组的归并合并，写法和原理类似
+
+          2. 核心逻辑代码
+
+             ```java
+             public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+                 ListNode dummy =new ListNode(0);
+                 ListNode tail =dummy;
+                 while(list1!=null && list2!=null){
+                     if(list1.val<list2.val){
+                         ListNode next=list1.next;
+                         list1.next=null;
+                         //上面两行完全可以省略，因为下面的单个链表最后整体追加的时候
+                         //会覆盖掉原本tail后面多余的链表
+                         tail.next=list1;
+                         tail=tail.next;
+                         list1=next;
+                     }else{
+                         ListNode next=list2.next;
+                         list2.next=null;
+                         //上面两行完全可以省略，因为下面的单个链表最后整体追加的时候
+                         //会覆盖掉原本tail后面多余的链表
+                         tail.next=list2;
+                         tail=tail.next;
+                         list2=next;
+                     }
+                 }
+                 //链表合并完不需要一个一个合并了，直接剩下部分整体追加即可
+                 //同时下面两个if一定会有一个被执行，所以会覆盖掉原本tail后面多余的链表(直呼巧妙)
+                 if(list1!=null){
+                     tail.next=list1;
+                 }
+                 if(list2!=null){
+                     tail.next=list2;
+                 }
+             
+                 return dummy.next;
+             }
+             
+             //升华
+             //此题可以巧妙地构造递归函数，子路如下
+             public ListNode dfs(ListNode node1,ListNode node2){
+                 if(node1==null){
+                     return node2;
+                 }else if(node2==null){
+              		return node1;       
+                 }else if(node1.val<node2.val){
+                     node1.next=dfs(node1.next,node2);
+                 }else{
+                     node2.next=dfs(node1,node2.next);
+                 }
+             }
+             ```
+
+       5. [两数相加](https://leetcode.cn/problems/add-two-numbers/)
+
+          1. 这题大模型为上一题的链表的归并
+
+          2. 题目中已知条件为逆序，这是一个简化条件，因为我们计算的时候一定是从个位开始，那么正好可以两链表互相加
+
+          3. 注意点
+
+             1. 需要合理的设定出进位carry和mod余数变量
+             2. 其次考虑某一个链表没有更多元素了（归并模型）
+             3. 最后需要注意最后carry是否不为0，这样会多进一位
+
+          4. 核心逻辑代码
+
+             ```java
+             public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+                 int carry =0;
+                 int mod =0;
+                 //链表常用虚拟头结点技巧
+                 ListNode dummy = new ListNode(0);
+                 ListNode tail = dummy;
+                 //归并模型
+                 while(l1!=null && l2!=null){
+                     mod=(l1.val+l2.val+carry) % 10;
+                     carry =(l1.val+l2.val+carry) / 10;
+                     ListNode node = new ListNode(mod);
+                     tail.next=node;
+                     tail=tail.next;
+                     l1=l1.next;
+                     l2=l2.next;
+                 }
+                 //不同于链表合并，这里要考虑999这种连续进位的情况，因而需要遍历每一位
+                 while(l1!=null){
+                     mod=(l1.val+carry) % 10;
+                     carry =(l1.val+carry) / 10;
+                     ListNode node = new ListNode(mod);
+                     tail.next=node;
+                     tail=tail.next;
+                     l1=l1.next;
+                 }
+                 //不同于链表合并，这里要考虑999这种连续进位的情况，因而需要遍历每一位
+                 while(l2!=null){
+                     mod=(l2.val+carry) % 10;
+                     carry =(l2.val+carry) / 10;
+                     ListNode node = new ListNode(mod);
+                     tail.next=node;
+                     tail=tail.next;
+                     l2=l2.next;
+                 }
+             	
+                 //最后两个链表都相加结束后可能会发生进位，需要额外添加一个结点
+                 if(carry!=0){
+                     ListNode node = new ListNode(carry);
+                     tail.next=node;
+                 }
+                 return dummy.next;
+             }
+             ```
+
+       6. [删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
+
+          1. 暴力法
+
+             1. 先遍历得到链表长度len，删除倒数第n个就是删除正数第len+1-n，也就是找到第len-n个结点node
+             2. node.next=node.next.next
+
+          2. 递归法
+
+             1. 题目需要删除倒数，那么显然使用后序遍历可以拿到对应的第n个结点序号
+             2. node.next=node.next.next
+             3. 递归函数每一次返回倒数第几个的数值
+
+          3. 核心逻辑代码
+
+             ```java
+             public ListNode removeNthFromEnd(ListNode head, int n) {
+                 //删除倒数第N个意味着删除正数第len+1-N个结点
+                 int len =0;
+                 ListNode hd =head;
+                 //求len
+                 while(hd!=null){
+                     len++;
+                     hd=hd.next;
+                 }
+             
+                 n=len+1-n;
+                 len=0;
+                 hd =head;
+                 while(hd!=null && len <n){
+                     len++;
+                     //如果删的是第一个则直接返回。可以添加虚拟头节点，避免，具体尝试
+                     if(n==1){
+                         return hd.next;
+                     }
+                     //找到第len-n个结点
+                     if(len==n-1){
+                         hd.next=hd.next.next;
+                         break;
+                     }
+                     hd=hd.next;
+                 }
+                 return head;
+             }
+             
+             
+             
+             //递归法
+             public ListNode removeNthFromEnd(ListNode head, int n) {
+                //一般判断方式
+                 
+                //if(afterTrverse(head,n)==n){
+                //    return head.next;
+                //}
+                //return head;
+                 
+                //添加虚拟头节点方式 
+                ListNode dummy = new ListNode(0);
+                dummy.next=head;
+                afterTrverse(dummy,n) 
+                return dummy.next; 
+             }
+             public int afterTrverse(ListNode head, int out) {
+                 if(head==null){
+                     return 0;
+                 }
+                 int num = afterTrverse(head.next,out);
+             
+                 if(out==num){
+                     head.next=head.next.next;
+                 }
+                 return num+1;
+             }
+             
+             
+             //升华
+             //本题常规法比较容易想到，但是具体细节需要注意如果删除倒数最后一个的时候的细节操作
+             //对于删除倒数最后一个的时候的细节操作添加虚拟节点有着不错的效果，需要思考和掌握
              ```
 
              
@@ -1110,9 +1473,100 @@
 
     7. 二叉树
 
-    8. 图
+    8. 位运算
 
-    9. 动态规划
+       1. 位运算和集合
+
+          1. 定义：一个非负整数集合S={m，n，k...}可以表示成以下公式,用集合中的每个元素作为2的幂指数，如{0，2，3}等价于2^0+2^2+2^3=13
+
+             
+             $$
+             f(S) = \sum_{i \in S} 2^i
+             $$
+             
+
+          2. 集合与集合的关系
+
+             | 术语       | 集合       | 位运算            | 举例                                 | 举例                                        |
+             | ---------- | ---------- | ----------------- | ------------------------------------ | ------------------------------------------- |
+             | 交集       | A∩B        | a&b               | {0, 2, 3} ∩ {0, 1, 2} = {0, 2}       | 1101 & 0111 = 0101                          |
+             | 并集       | A∪B        | a\|b              | {0, 2, 3} ∪ {0, 1, 2} = {0, 1, 2, 3} | 1101 \| 0111 = 1111                         |
+             | 对称差     | A Δ B      | a^b               | {0, 2, 3} Δ {0, 1, 2} = {1, 3}       | 1101 ^ 0111 = 1010                          |
+             | 差         | A∖B        | a&~b              | {0, 2, 3} ∖ {1, 2} = {0, 3}          | 1101 & 1001 = 1001                          |
+             | 差（子集） | A∖B（A⊆B） | a^b               | {0, 2, 3} ∖ {0, 2} = {3}             | 1101 ^ 0101 = 1000                          |
+             | 包含于     | A⊆B        | a&b=a<br />a\|b=b | {0, 2} ⊆ {0, 2, 3}                   | 0101 & 1101 = 0101<br />0101 \| 1101 = 1101 |
+
+          3. 集合与元素的关系
+
+             | 术语                     | 集合           | 位运算                   | 举例                                 | 举例                                 |
+             | ------------------------ | -------------- | ------------------------ | ------------------------------------ | ------------------------------------ |
+             | 空集                     | ∅              | 0                        | ∅                                    | 0                                    |
+             | 单元素集合               | {i}            | 1 << i                   | {2}                                  | 1 << 2                               |
+             | 全集                     | U={0,1,2,⋯n-1} | (1 << n) - 1             | {0,1,2,3}                            | (1 << 4) - 1                         |
+             | 补集                     | ∁S = U∖S       | ∼S 或 ((1 << n) - 1) ⊕ S | ∼{0,2,3} 或 ((1 << 4) - 1) ⊕ {0,2,3} | ∼{0,2,3} 或 ((1 << 4) - 1) ⊕ {0,2,3} |
+             | 属于                     | i∈S            | (s >> i) & 1 = 1         | 2∈{0,2,3}                            | (1101 >> 2) & 1 = 1                  |
+             | 不属于                   | i∉S            | (s >> i) & 1 = 0         | 1∉{0,2,3}                            | (1101 >> 1) & 1 = 0                  |
+             | 添加元素                 | S∪{i}          | s\|(1 << i)              | {0,3} ∪ {2}                          | 1001 ∣ (1 << 2)                      |
+             | 删除元素                 | S∖{i}          | s & ∼(1 << i)            | {0,2,3} ∖ {2}                        | 1101 & ∼(1 << 2)                     |
+             | 删除元素（一定在集合中） | S∖{i}（i∈S）   | s ⊕ (1 << i)             | {0,2,3} ∖ {2}                        | 1101 ⊕ (1 << 2)                      |
+             | 删除最小元素             |                | s & (s - 1)              |                                      |                                      |
+
+          4. 遍历集合
+
+             ```java
+             for (int i = 0; i < n; i++) {
+                 if (((s >> i) & 1) == 1) { // i 在 s 中
+                     // 处理 i 的逻辑
+                 }
+             }
+             ```
+
+          5. 枚举集合
+
+             ```java
+             for (int s = 0; s < (1 << n); s++) {
+                 // 处理 s 的逻辑
+             }
+             ```
+
+          6. Java自带位运算API
+
+             | 术语                                   | Java                                 |
+             | -------------------------------------- | ------------------------------------ |
+             | 集合大小（元素个数）                   | Integer.bitcount(s)                  |
+             | 二进制长度（减一得到集合中的最大元素） | 32 - Integer.numberOfLeadingZeros(s) |
+             | 集合中的最小元素                       | Integer.numberOfTrailingZeros(s)     |
+
+          7. 基本巩固（求全排列）
+
+             ```java
+             //此题应用到了遍历集合和枚举集合，基础模板应当熟记于心
+             public static List<List<String>> quanPaiLie(String[] strs){
+                 //String[] strs =new String[]{"A", "B", "C"}
+                 List<List<String>> rets =new ArrayList<>();
+                 //计算长度n
+                 int n = strs.length;
+                 //枚举集合所有子集
+                 for (int i = 0; i < (1<<n); i++) {
+                     List<String> ret= new ArrayList<String>();
+                     //遍历每个子集中元素的所有索引
+                     for (int j = 0; j < n; j++) {
+                         //子集中含有某个元素
+                         if (((i>>j)&1)==1){
+                             ret.add(strs[j]);
+                         }
+                     }
+                     rets.add(ret);
+                 }
+                 return rets;
+             };
+             ```
+
+             
+
+    9. 图
+
+    10. 动态规划
 
        1. 基础递推
 
