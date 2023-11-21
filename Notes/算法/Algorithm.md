@@ -1030,7 +1030,7 @@
                  //更新新的前驱结点
                  head = root;
                  //更新新的根节点
-                 root =root.next;
+                 root =next;
              }
              
              
@@ -1374,7 +1374,109 @@
              
              //升华
              //本题常规法比较容易想到，但是具体细节需要注意如果删除倒数最后一个的时候的细节操作
-             //对于删除倒数最后一个的时候的细节操作添加虚拟节点有着不错的效果，需要思考和掌握
+             //对于删除倒数最后一个的时候的细节操作添加虚拟节点有着不错的效果，需要思考和掌握	
+             ```
+
+       7. [K 个一组翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/)
+
+          1. 遇到链表首先考虑是否有递归状态，显然f(head[1-n])=reverse(head[1-k])+f(head[k+1-n])
+
+          2. 思路
+
+             1. 代理遍历head结点，同时计数，当到达k个的时候，把当前结点next结点临时存起来当作递归结点nextHead
+             2. 然后置空当前节点next
+             3. 反转head结点+递归调用(nextHead)
+
+          3. 核心逻辑代码
+
+             ```java
+             public static ListNode reverseKGroup(ListNode head, int k) {
+                 int count =0;
+                 ListNode hd =head;
+                 while(hd!=null){
+                     count++;
+                     //找到第k个结点
+                     if(count==k){
+                         //第k个结点以后的结点临时存起来
+                         ListNode next =hd.next;
+                         //第k个结点置空next结点，让head结点只剩前面k个结点
+                         hd.next=null;
+                         ListNode tail = reverseKGroup(next, k);
+                         //反转只有k个节点的head结点，同时将其后面的递归返回结点连起来
+                         head=reverseK(head,tail);
+                         return head;
+                     }
+                     hd=hd.next;
+                 }
+                 return head;
+             }
+             public static ListNode reverseK(ListNode head,ListNode tail) {
+                 while(head!=null){
+                     ListNode next =head.next;
+                     head.next=tail;
+                     tail=head;
+                     head=next;
+                 }
+                 return tail;
+             }
+             ```
+
+       8. [排序链表](https://leetcode.cn/problems/sort-list/)
+
+          1. 对于链表排序，我们最容易想到的方式是将链表拆散装进List中然后进行排序，最后还原链表即可，但是这种方法时间复杂度nlogn空间复杂度n不太理想
+
+          2. 考虑满足时间复杂度nlogn的排序方式有快速，归并，堆，显然快速排序和堆具有跨界点操作特性，交换位置比较繁琐，最直观的是使用归并排序，进行相邻排序
+
+          3. 模仿数组的归并排序，先将链表打散到一个一个的结点，然后逐级合并
+
+             1. 打散(递归)
+             2. 合并(链表合并模型)
+
+          4. 核心逻辑代码
+
+             ```java
+             public ListNode sortList(ListNode head) {
+                 //链表归并排序
+                 if(head==null ||head.next==null){
+                     return head;
+                 }
+                 //这里是寻找链表中点的模型需要熟记于心
+                 ListNode slow =head;
+                 ListNode fast =head.next;
+                 while(fast!=null&&fast.next!=null){
+                     slow=slow.next;
+                     fast=fast.next.next;
+                 }
+                 //将链表从中间节点断开分成前后两个链表，进行左右递归
+                 ListNode head2=slow.next;
+                 slow.next=null;
+                 //左右递归，并将结果反向合并
+                 return mergeNode(sortList(head),sortList(head2));
+             }
+             
+             public ListNode mergeNode(ListNode node1,ListNode node2){
+                 ListNode dummy = new ListNode(0);
+                 ListNode tail =dummy;
+                 while(node1!=null && node2!=null){
+                     if(node1.val<node2.val){
+                         //把node1的头节点摘下来放到dummy后面
+                         tail.next=node1;
+                         node1=node1.next;
+                     }else{
+                         //把node2的头节点摘下来放到dummy后面
+                         tail.next=node2;
+                         node2=node2.next;
+                     }
+                     tail=tail.next;
+                 }
+                 if(node1!=null){
+                     tail.next=node1;
+                 }
+                 if(node2!=null){
+                     tail.next=node2;
+                 }
+                 return dummy.next;
+             }
              ```
 
              
@@ -1473,6 +1575,64 @@
 
     7. 二叉树
 
+       1. dfs/bfs基本模型
+
+          1. [二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
+
+          2. dfs
+
+             ```java
+             public int maxDepth =0;
+             //dfs
+             public int maxDepth(TreeNode root) {
+                 if(root==null){
+                     return 0;
+                 }
+                 maxDepth(root,1);
+                 return maxDepth;
+             }
+             public void maxDepth(TreeNode root,int layer) {
+                 if(root==null){
+                     return;
+                 }
+                 maxDepth = Math.max(maxDepth,layer);
+                 maxDepth(root.left,layer+1);
+                 maxDepth(root.right,layer+1);
+             }
+             ```
+
+          3. bfs
+
+             ```java
+             public int maxDepth(TreeNode root) {
+                 int maxDepth =0;
+                 if(root==null){
+                     return 0;
+                 }
+                 LinkedList<TreeNode> queue = new LinkedList<>();
+                 queue.offer(root);
+                 int deep =0;
+             
+                 while(!queue.isEmpty()){
+                     int size = queue.size();
+                     for(int i=0;i<size;i++){
+                         TreeNode node = queue.poll();
+                         if(node.left!=null){
+                             queue.offer(node.left);
+                         }
+                         if(node.right!=null){
+                             queue.offer(node.right);
+                         }
+                     }
+                     deep++;
+                     maxDepth = Math.max(maxDepth,deep);
+                 }
+                 return maxDepth;
+             }
+             ```
+
+             
+
     8. 位运算
 
        1. 位运算和集合
@@ -1484,9 +1644,8 @@
              f(S) = \sum_{i \in S} 2^i
              $$
              
-
           2. 集合与集合的关系
-
+    
              | 术语       | 集合       | 位运算            | 举例                                 | 举例                                        |
              | ---------- | ---------- | ----------------- | ------------------------------------ | ------------------------------------------- |
              | 交集       | A∩B        | a&b               | {0, 2, 3} ∩ {0, 1, 2} = {0, 2}       | 1101 & 0111 = 0101                          |
@@ -1495,9 +1654,9 @@
              | 差         | A∖B        | a&~b              | {0, 2, 3} ∖ {1, 2} = {0, 3}          | 1101 & 1001 = 1001                          |
              | 差（子集） | A∖B（A⊆B） | a^b               | {0, 2, 3} ∖ {0, 2} = {3}             | 1101 ^ 0101 = 1000                          |
              | 包含于     | A⊆B        | a&b=a<br />a\|b=b | {0, 2} ⊆ {0, 2, 3}                   | 0101 & 1101 = 0101<br />0101 \| 1101 = 1101 |
-
+    
           3. 集合与元素的关系
-
+    
              | 术语                     | 集合           | 位运算                   | 举例                                 | 举例                                 |
              | ------------------------ | -------------- | ------------------------ | ------------------------------------ | ------------------------------------ |
              | 空集                     | ∅              | 0                        | ∅                                    | 0                                    |
@@ -1510,9 +1669,9 @@
              | 删除元素                 | S∖{i}          | s & ∼(1 << i)            | {0,2,3} ∖ {2}                        | 1101 & ∼(1 << 2)                     |
              | 删除元素（一定在集合中） | S∖{i}（i∈S）   | s ⊕ (1 << i)             | {0,2,3} ∖ {2}                        | 1101 ⊕ (1 << 2)                      |
              | 删除最小元素             |                | s & (s - 1)              |                                      |                                      |
-
+    
           4. 遍历集合
-
+    
              ```java
              for (int i = 0; i < n; i++) {
                  if (((s >> i) & 1) == 1) { // i 在 s 中
@@ -1520,25 +1679,25 @@
                  }
              }
              ```
-
+    
           5. 枚举集合
-
+    
              ```java
              for (int s = 0; s < (1 << n); s++) {
                  // 处理 s 的逻辑
              }
              ```
-
+    
           6. Java自带位运算API
-
+    
              | 术语                                   | Java                                 |
              | -------------------------------------- | ------------------------------------ |
              | 集合大小（元素个数）                   | Integer.bitcount(s)                  |
              | 二进制长度（减一得到集合中的最大元素） | 32 - Integer.numberOfLeadingZeros(s) |
              | 集合中的最小元素                       | Integer.numberOfTrailingZeros(s)     |
-
+    
           7. 基本巩固（求全排列）
-
+    
              ```java
              //此题应用到了遍历集合和枚举集合，基础模板应当熟记于心
              public static List<List<String>> quanPaiLie(String[] strs){
@@ -1561,189 +1720,216 @@
                  return rets;
              };
              ```
-
-             
-
+    
+       2. 位运算技巧
+    
+          1. 两个数x，y进行异或，各个位相同为0不同为1
+    
+          2. 如果取模运算中的模值是一个2的指数幂的数那么x mod M=x & (M-1)
+    
+          3. x & -x的作用是找到x中最低为的1出现的位置，原理是-x的二进制是由x对应的补码全部位取反+1，这样如果不加1则x & -x必为0，加了1后正好成为最低为的1
+    
     9. 图
-
+    
     10. 动态规划
+    
+       11. 基础递推
+    
+           1. 接雨水的动态规划法
+    
+              1. 某个点的储水量由该点左边的最大值和右边的最大值的相对较小（短板）决定
+    
+              2. 上述求得的较小的短板值-该点的高度，如果结果>0，则该值就是储水量，如果<0则说明此处无法盛水，即储水量为0
+    
+              3. 某点储水量=Max(Min(Max(height[0]~height[i-1]),Max(height[i+1]~height[height.length-1]))-height[i],0)
+    
+              4. 核心逻辑代码
+    
+                 ```java
+                 
+                 int[] nums;
+                 int[] leftMax = new int[nums.length];
+                 //动态规划求每个点对应左边的最大值列表
+                 leftMax[0]=0;//数列base值
+                 for(int left=1;left<nums.length;left++){
+                     //数列递推公式
+                     leftMax[i]=Math.max(leftMax[i-1],nums[i-1]);
+                 }
+                 int[] rightMax = new int[nums.length];
+                 rightMax[nums.length-1]=0;//数列base值
+                 //动态规划求每个点对应右边的最大值列表
+                 for(int right=nums.length-1;right>=0;right--){
+                     //数列递推公式
+                     rightMax[right]=Math.max(rightMax[right+1],nums[right+1]);
+                 }
+                 
+                 //储水量
+                 int sum =0;
+                 for(int i=1;i<nums.length;i++){
+                 	sum+=Math.max(Math.min(leftMax[i],rightMax[i])-nums[i],0);
+                 }
+                 ```
+    
+           2. 最大子数组和
+    
+              1. 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+    
+              2. 首先想到暴力枚举，那么显然需要n3的时间复杂度，显然不可取
+    
+              3. 其次如果考虑前缀和计算出数组的前缀和的话，会发现显然还需要n2的时间复杂度，也不尽人意
+    
+              4. 最后如果考虑动态规划则问题得到巧妙地解决
+    
+                 1. 状态定义dp[i]：以nums[i]结尾的子数组的最大和值
+    
+                 2. 状态转移方程：dp[i]=dp[i-1]<=0?nums[i]:nums[i]+dp[i-1]
+    
+                 3. 初始状态：dp[0]=nums[0]
+    
+              5. 核心逻辑代码
+    
+                 ```java
+                 dp[0]=nums[0];
+                 //最大连续子数组和值
+                 int maxSum=dp[0];
+                 for(int i=1;i<nums.length;i++){
+                     dp[i]=dp[i-1]<=0?nums[i]:nums[i]+dp[i-1];
+                 	maxSum=Math.max(maxSum,dp[i]);
+                 }
+                 return maxSum;
+                 
+                 //优化
+                 //由题目可知,每个dp[i]元素都只是在不断前进的过程中被立刻使用,不存在回表反复查询,故可以使用双变量交替,降低空间复杂度
+                 int before=nums[0];
+                 int maxSum=before;
+                 for(int i=1;i<nums.length;i++){
+                     before=before>0?before+nums[i]:nums[i];
+                     maxSum =Math.max(maxSum,before);
+                 }
+                 return maxSum;
+                 
+                 //升华
+                 //本题旨在理解动态规划做题过程，同时掌握解题基本流程和套路
+                 ```
+    
+           3. [除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)
+    
+              1. 题目要求不使用除法和O(n)时间复杂度，不要多想，朝着dp思考
+    
+              2. 其次，题目强调任意元素的全部前缀元素和后缀的乘积都在32位整数范围内则朝着前缀积和后缀积的方向思考
+    
+              3. 动态规划要素
 
-       1. 基础递推
+                 1. 状态:beforeSum[i]/afterSum[i]分别代表nums[i]元素的前缀积和后缀积
 
-          1. 接雨水的动态规划法
-
-             1. 某个点的储水量由该点左边的最大值和右边的最大值的相对较小（短板）决定
-
-             2. 上述求得的较小的短板值-该点的高度，如果结果>0，则该值就是储水量，如果<0则说明此处无法盛水，即储水量为0
-
-             3. 某点储水量=Max(Min(Max(height[0]~height[i-1]),Max(height[i+1]~height[height.length-1]))-height[i],0)
-
-             4. 核心逻辑代码
-
-                ```java
-                
-                int[] nums;
-                int[] leftMax = new int[nums.length];
-                //动态规划求每个点对应左边的最大值列表
-                leftMax[0]=0;//数列base值
-                for(int left=1;left<nums.length;left++){
-                    //数列递推公式
-                    leftMax[i]=Math.max(leftMax[i-1],nums[i-1]);
-                }
-                int[] rightMax = new int[nums.length];
-                rightMax[nums.length-1]=0;//数列base值
-                //动态规划求每个点对应右边的最大值列表
-                for(int right=nums.length-1;right>=0;right--){
-                    //数列递推公式
-                    rightMax[right]=Math.max(rightMax[right+1],nums[right+1]);
-                }
-                
-                //储水量
-                int sum =0;
-                for(int i=1;i<nums.length;i++){
-                	sum+=Math.max(Math.min(leftMax[i],rightMax[i])-nums[i],0);
-                }
-                ```
-
-          2. 最大子数组和
-
-             1. 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
-
-             2. 首先想到暴力枚举，那么显然需要n3的时间复杂度，显然不可取
-
-             3. 其次如果考虑前缀和计算出数组的前缀和的话，会发现显然还需要n2的时间复杂度，也不尽人意
-
-             4. 最后如果考虑动态规划则问题得到巧妙地解决
-
-                1. 状态定义dp[i]：以nums[i]结尾的子数组的最大和值
-
-                2. 状态转移方程：dp[i]=dp[i-1]<=0?nums[i]:nums[i]+dp[i-1]
-
-                3. 初始状态：dp[0]=nums[0]
-
-             5. 核心逻辑代码
-
-                ```java
-                dp[0]=nums[0];
-                //最大连续子数组和值
-                int maxSum=dp[0];
-                for(int i=1;i<nums.length;i++){
-                    dp[i]=dp[i-1]<=0?nums[i]:nums[i]+dp[i-1];
-                	maxSum=Math.max(maxSum,dp[i]);
-                }
-                return maxSum;
-                
-                //优化
-                //由题目可知,每个dp[i]元素都只是在不断前进的过程中被立刻使用,不存在回表反复查询,故可以使用双变量交替,降低空间复杂度
-                int before=nums[0];
-                int maxSum=before;
-                for(int i=1;i<nums.length;i++){
-                    before=before>0?before+nums[i]:nums[i];
-                    maxSum =Math.max(maxSum,before);
-                }
-                return maxSum;
-                
-                //升华
-                //本题旨在理解动态规划做题过程，同时掌握解题基本流程和套路
-                ```
-
-          3. [除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)
-
-             1. 题目要求不使用除法和O(n)时间复杂度，不要多想，朝着dp思考
-
-             2. 其次，题目强调任意元素的全部前缀元素和后缀的乘积都在32位整数范围内则朝着前缀积和后缀积的方向思考
-
-             3. 动态规划要素
-
-                1. 状态:beforeSum[i]/afterSum[i]分别代表nums[i]元素的前缀积和后缀积
-
-                2. 状态转移方程:
-                   1. beforeSum[i]=beforeSum[i-1]*nums[i-1]
-
-                   2. afterSum[i]=afterSum[i+1]*afterSum[i+1]
-
-                3. 初始状态:beforeSum[0]=1,afterSum[nums.length-1]=1
-
-             4. 核心逻辑代码
-
-                ```java
-                //常规方法T(n)+S(n)
-                //定义状态
-                int len =nums.length;
-                int[] answer = new int[len];
-                int[] beforeSum = new int[len];
-                int[] afterSum = new int[len];
-                //初始值
-                beforeSum[0]=1;
-                afterSum[len-1]=1;
-                for(int i=1;i<len;i++){
-                    //基本动态规划递推
-                    beforeSum[i]=beforeSum[i-1]*nums[i-1];
-                    //i-0=len-1-x => x=len-1-i
-                    afterSum[len-1-i]=afterSum[len-i]*nums[len-i];
-                }
-                for(int i=0;i<len;i++){
-                    answer[i]=beforeSum[i]*afterSum[i];
-                }
-                
-                return answer;
-                
-                //进阶方法T(n)+S(1)
-                //定义状态
-                int len =nums.length;
-                int[] answer = new int[len];
-                //将原先的beforeSum和afterSum分部乘到answer中，因而初始化1
-                Arrays.fill(answer,1);
-                int beforeSum = 1;
-                int afterSum = 1;
-                //初始值
-                for(int i=0;i<len;i++){
-                    //基本动态规划递推
-                    beforeSum=beforeSum*(i==0?1:nums[i-1]);
-                    afterSum=afterSum*(i==0?1:nums[len-i]);
-                    answer[i]*=beforeSum;
-                    answer[len-i-1]*=afterSum;
-                }
-                
-                return answer;
-                ```
-
-                
-
-       2. 前缀和
-
-          1. 和为K的子数组
-
-             1. 基本想法使用双指针枚举所有组合[i-j]，然后计算sum[i-j],但是这样时间复杂度n3，显然不是最佳方法
-
-             2. 考虑sum[i-j]=sum[j]-dum[i-1]满足前缀和，则可以先用dp求出sum[i]=sum[i-1]+nums[i-1]
-
-             3. 然后再次使用双指针枚举，此时求和计算省去o(n),因而时间复杂度变为n2
-
-             4. 此时可以看出还符合两数之和的模型，只不过这里是两数之差，稍微变形即可
-
-             5. 核心逻辑代码
-
-                ```java
-                // 前缀和+哈希(类似两数之和的策略) O(n)+O(n)
-                int[] sum =new int[nums.length+1];
-                int count=0;
-                for(int i=1;i<sum.length;i++){
-                    //前缀和动态规划
-                    sum[i]=sum[i-1]+nums[i-1];
-                }
-                Map<Integer,Integer> map = new HashMap<>();
-                for(int i=0;i<sum.length;i++){
-                    //参考两数字和，只不过两数之和这里应该是k-sum[i]
-                    if(map.containsKey(sum[i]-k)){
-                        count+=map.get(sum[i]-k);
-                    }
-                    //两数之和求得是元素索引，同时保证答案唯一，所以此处value存的是索引
-                    //但是本体求的是满足条件的所有个数，因而将key进行计数，从而得到全部个数
-                    map.put(sum[i],map.getOrDefault(sum[i],0)+1);
-                }
-                
-                return count;
-                ```
-
-                
+                 2. 状态转移方程:
+                    1. beforeSum[i]=beforeSum[i-1]*nums[i-1]
+    
+                    2. afterSum[i]=afterSum[i+1]*afterSum[i+1]
+    
+                 3. 初始状态:beforeSum[0]=1,afterSum[nums.length-1]=1
+    
+              4. 核心逻辑代码
+    
+                 ```java
+                 //常规方法T(n)+S(n)
+                 //定义状态
+                 int len =nums.length;
+                 int[] answer = new int[len];
+                 int[] beforeSum = new int[len];
+                 int[] afterSum = new int[len];
+                 //初始值
+                 beforeSum[0]=1;
+                 afterSum[len-1]=1;
+                 for(int i=1;i<len;i++){
+                     //基本动态规划递推
+                     beforeSum[i]=beforeSum[i-1]*nums[i-1];
+                     //i-0=len-1-x => x=len-1-i
+                     afterSum[len-1-i]=afterSum[len-i]*nums[len-i];
+                 }
+                 for(int i=0;i<len;i++){
+                     answer[i]=beforeSum[i]*afterSum[i];
+                 }
+                 
+                 return answer;
+                 
+                 //进阶方法T(n)+S(1)
+                 //定义状态
+                 int len =nums.length;
+                 int[] answer = new int[len];
+                 //将原先的beforeSum和afterSum分部乘到answer中，因而初始化1
+                 Arrays.fill(answer,1);
+                 int beforeSum = 1;
+                 int afterSum = 1;
+                 //初始值
+                 for(int i=0;i<len;i++){
+                     //基本动态规划递推
+                     beforeSum=beforeSum*(i==0?1:nums[i-1]);
+                     afterSum=afterSum*(i==0?1:nums[len-i]);
+                     answer[i]*=beforeSum;
+                     answer[len-i-1]*=afterSum;
+                 }
+                 
+                 return answer;
+                 ```
+    
+                 
+    
+       12. 前缀和
+    
+           1. 和为K的子数组
+    
+              1. 基本想法使用双指针枚举所有组合[i-j]，然后计算sum[i-j],但是这样时间复杂度n3，显然不是最佳方法
+    
+              2. 考虑sum[i-j]=sum[j]-dum[i-1]满足前缀和，则可以先用dp求出sum[i]=sum[i-1]+nums[i-1]
+    
+              3. 然后再次使用双指针枚举，此时求和计算省去o(n),因而时间复杂度变为n2
+    
+              4. 此时可以看出还符合两数之和的模型，只不过这里是两数之差，稍微变形即可
+    
+              5. 核心逻辑代码
+    
+                 ```java
+                 // 前缀和+哈希(类似两数之和的策略) O(n)+O(n)
+                 int[] sum =new int[nums.length+1];
+                 int count=0;
+                 for(int i=1;i<sum.length;i++){
+                     //前缀和动态规划
+                     sum[i]=sum[i-1]+nums[i-1];
+                 }
+                 Map<Integer,Integer> map = new HashMap<>();
+                 for(int i=0;i<sum.length;i++){
+                     //参考两数字和，只不过两数之和这里应该是k-sum[i]
+                     if(map.containsKey(sum[i]-k)){
+                         count+=map.get(sum[i]-k);
+                     }
+                     //两数之和求得是元素索引，同时保证答案唯一，所以此处value存的是索引
+                     //但是本体求的是满足条件的所有个数，因而将key进行计数，从而得到全部个数
+                     map.put(sum[i],map.getOrDefault(sum[i],0)+1);
+                 }
+                 
+                 return count;
+                 ```
+    
+    13. 算法常用Java原生API
+    
+        1. 数组集合转换
+    
+           ```java
+           //集合转int[]
+           list/set.stream().mapToInt(x->x).toArray();
+           //集合转Integer[]
+           list/set.stream().toArray(Integer[]::new);
+           
+           //int[]转Integer[]
+           Arrays.stream(int[]).boxed().toArray(Integer[]::new)
+           //int[]转集合
+           Arrays.stream(int[]).boxed().collect(Collectors.toList())
+           
+           //Integer[]转int[]
+           Arrays.stream(Integer[]).mapToInt(x -> x).toArray()
+           //Integer[]转集合
+           Arrays.stream(Integer[]).collect(Collectors.toList())
+           ```
+    
+           
